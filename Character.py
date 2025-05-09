@@ -33,7 +33,7 @@ class Character(pygame.sprite.Sprite):
         # Set initial spawn position in world coordinates
         self.Character_rect = self.player.get_rect(topleft=(100, 100))  # Adjust to avoid house collision
         self.speed = [0, 0]
-        self.acceleration = 5
+        self.acceleration = 2
         self.scale = 50
         self.hp = 100
         self.max_hp = 100
