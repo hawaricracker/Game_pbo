@@ -1,5 +1,5 @@
 import pygame
-
+#class player
 class Character(pygame.sprite.Sprite):
     def __init__(self):
         global WIDTH, HEIGHT
