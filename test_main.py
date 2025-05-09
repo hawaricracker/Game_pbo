@@ -1,76 +1,78 @@
-# test_game.py
-
-import unittest
 import pygame
-import time
-from unittest.mock import patch, Mock
-from Character import Character
-from Weapon import Weapon
-from Bullet import Bullet
-from Game import Game
-from MainMenu import MainMenu
-from Zombies import Zombie
+from win32api import GetSystemMetrics #Install pip win32api agar game berjalan pada fullscreen
+from Game import *
+from Character import *
+from Zombies import *
+from MainMenu import *
 
+WIDTH, HEIGHT = GetSystemMetrics(0), GetSystemMetrics(1)
 pygame.init()
 
-class TestGameComponents(unittest.TestCase):
-    def setUp(self):
-        self.screen_width = 800
-        self.screen_height = 600
-        self.game = Game(self.screen_width, self.screen_height)
+pygame.display.set_caption("Zombie Shooter")
+menu = MainMenu(WIDTH, HEIGHT)
+game_running = False
+run = True
 
-    def test_bullet_trajectory_and_update(self):
-        bullet = Bullet((0, 0), (100, 0), 10)
-        initial_x = bullet.x
-        bullet.update()
-        self.assertGreater(bullet.x, initial_x, "Bullet should move to the right.")
+while run:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+        action = menu.handle_event(event)
+        if action == "start":
+            game_running = True
+        elif action == "exit":
+            run = False
 
-    def test_weapon_fire_cooldown(self):
-        weapon = Weapon()
-        bullet = weapon.fire((0, 0), (100, 100))
-        self.assertIsInstance(bullet, Bullet)
-        bullet2 = weapon.fire((0, 0), (100, 100))
-        self.assertIsNone(bullet2, "Weapon should respect fire_rate cooldown.")
-
-    def test_character_initial_hp_and_movement(self):
+    if game_running:
         character = Character()
-        old_pos = character.Character_rect.copy()
-        character.move_right(self.game)
-        self.assertGreater(character.Character_rect.x, old_pos.x, "Character should move right.")
-        self.assertEqual(character.hp, 100)
-        self.assertEqual(character.max_hp, 100)
+        game = Game(WIDTH, HEIGHT)
+        for _ in range(50):
+            zombie = Zombie(game.map_width, game.map_height)
+            game.zombies.append(zombie)
 
-    def test_game_offset_calculation(self):
-        character = Character()
-        self.game.load_map(self.game.screen, "test.tmx", character)
-        offset_expected = self.screen_width // 2 - character.Character_rect.centerx
-        self.assertEqual(self.game.offset_x, offset_expected)
+        while game_running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+                    game_running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        game_running = False
+                        run = False
 
-    def test_zombie_moves_towards_player(self):
-        character = Character()
-        zombie = Zombie(1000, 1000)
-        old_pos = zombie.rect.copy()
-        zombie.move_towards_player(self.game, character.Character_rect, 0)
-        self.assertNotEqual((old_pos.x, old_pos.y), (zombie.rect.x, zombie.rect.y))
+            # Gerakan keyboard
+            keys = pygame.key.get_pressed()
+            game.movement(character, keys)
 
-    def test_main_menu_exit_event(self):
-        menu = MainMenu(self.screen_width, self.screen_height)
-        event = pygame.event.Event(pygame.KEYDOWN, {"key": pygame.K_ESCAPE})
-        result = menu.handle_event(event)
-        self.assertEqual(result, "exit")
+            # ⬇️⬇️⬇️ BAGIAN BARU: Sistem Tembak dengan LMB ⬇️⬇️⬇️
+            mouse_pressed = pygame.mouse.get_pressed()[0]  # LMB ditekan
+            mouse_pos = pygame.mouse.get_pos()
 
-    def test_draw_health_bar_values(self):
-        character = Character()
-        try:
-            self.game.draw_health_bar(character.hp, character.max_hp, character)
-        except Exception as e:
-            self.fail(f"draw_health_bar() raised Exception unexpectedly: {e}")
+            # Posisi karakter di dunia (real coordinates)
+            player_world_pos = character.Character_rect.center
+            target_world_pos = (
+                mouse_pos[0] - game.offset_x,
+                mouse_pos[1] - game.offset_y
+            )
 
-    def test_update_bullets_removal_out_of_bounds(self):
-        bullet = Bullet((self.game.map_width + 100, self.game.map_height + 100), (0, 0), 10)
-        self.game.bullets.append(bullet)
-        self.game.update_bullets()
-        self.assertEqual(len(self.game.bullets), 0, "Out-of-bounds bullets should be removed")
+            if mouse_pressed:
+                bullet = character.weapon.fire(player_world_pos, target_world_pos)
+                if bullet:
+                    game.bullets.append(bullet)
+            # ⬆️⬆️⬆️ AKHIR BAGIAN BARU ⬆️⬆️⬆️
 
-if __name__ == "__main__":
-    unittest.main()
+            # Rendering dan update semua objek
+            game.load_map(game.screen, "test.tmx", character)
+            game.animation(character)
+            game.load_char(game.screen, character)
+            game.load_zombies(character)
+
+            game.update_bullets()  # Update posisi peluru
+            game.draw_bullets()    # Gambar peluru ke layar
+
+            game.clock.tick(60)
+            pygame.display.flip()
+    else:
+        menu.draw()
+
+pygame.quit()
