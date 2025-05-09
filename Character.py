@@ -3,7 +3,6 @@ from Weapon import Weapon
 #class player
 class Character(pygame.sprite.Sprite):
     def __init__(self):
-        global WIDTH, HEIGHT
         pygame.sprite.Sprite.__init__(self)
         self.idling_frame_list = []
         self.moustache_frame_list = []
