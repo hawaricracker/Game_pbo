@@ -1,5 +1,6 @@
 import pygame
 import pytmx
+from Bullet import Bullet
 
 class Game:
     def __init__(self, width, height):
@@ -13,6 +14,7 @@ class Game:
         self.map_width = 0
         self.map_height = 0
         self.zombies = []
+        self.bullet = []
         # Load map dimensions immediately
         tmx_data = pytmx.load_pygame("test.tmx")
         self.map_width = tmx_data.width * tmx_data.tilewidth
@@ -111,3 +113,18 @@ class Game:
         pygame.draw.rect(self.screen, (0, 200, 0), (x, y, int(width * health_ratio), height))
         # (Opsional) bingkai tipis
         pygame.draw.rect(self.screen, (0, 0, 0), (x, y, width, height), 1)
+
+    def update_bullets(self):  # ⬅ Tambahan: memperbarui posisi semua peluru
+        for bullet in self.bullets:
+            bullet.update()
+
+        # ⬅ Menghapus peluru yang keluar dari batas peta
+        self.bullets = [
+            b for b in self.bullets
+            if 0 <= b.x <= self.map_width and 0 <= b.y <= self.map_height
+        ]
+
+    def draw_bullets(self):  # ⬅ Tambahan: menggambar peluru ke layar
+        for bullet in self.bullets:
+            bullet.draw(self.screen, self.offset_x, self.offset_y)
+
