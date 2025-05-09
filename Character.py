@@ -1,4 +1,5 @@
 import pygame
+from Weapon import Weapon
 #class player
 class Character(pygame.sprite.Sprite):
     def __init__(self):
@@ -11,7 +12,7 @@ class Character(pygame.sprite.Sprite):
         self.player = pygame.image.load("zombie/ZombieShooter/Sprites/Character/Body/Body.png")
         self.player_moustache = pygame.image.load("zombie/ZombieShooter/Sprites/Character/Moustach/Moustach1.png")
         self.player_shirt = pygame.image.load("zombie/ZombieShooter/Sprites/Character/Shirt/Shirt1.png")
-        self.weapon = pygame.image.load("zombie/ZombieShooter/Sprites/Objects&Tiles/Weapons.png")
+        self.weapon_img = pygame.image.load("zombie/ZombieShooter/Sprites/Objects&Tiles/Weapons.png")
 
         for y in range(self.player.get_height() // 32):
             for x in range(self.player.get_width() // 32):
@@ -25,7 +26,7 @@ class Character(pygame.sprite.Sprite):
         for y in range(self.weapon.get_height() // 32):
             for x in range(self.weapon.get_width() // 32):
                 wp_frame = self.weapon.subsurface(x * 32, y * (32 // 3), 32, (32 // 3))
-                self.weapon = wp_frame
+                self.weapon_img = wp_frame
 
         self.player = self.idling_frame_list[0]
         self.player_moustache = self.moustache_frame_list[0]
@@ -33,10 +34,11 @@ class Character(pygame.sprite.Sprite):
         # Set initial spawn position in world coordinates
         self.Character_rect = self.player.get_rect(topleft=(100, 100))  # Adjust to avoid house collision
         self.speed = [0, 0]
-        self.acceleration = 2
+        self.acceleration = 4
         self.scale = 50
         self.hp = 100
         self.max_hp = 100
+        self.weapon = Weapon() 
     
     def idling(self, frame_index):
         self.player = self.idling_frame_list[(frame_index // 7) % 4]
@@ -45,7 +47,7 @@ class Character(pygame.sprite.Sprite):
         self.player = pygame.transform.scale(self.player, (self.scale, self.scale))
         self.player_moustache = pygame.transform.scale(self.player_moustache, (self.scale, self.scale))
         self.player_shirt = pygame.transform.scale(self.player_shirt, (self.scale, self.scale))
-        self.weapon = pygame.transform.scale(self.weapon, (self.scale // 2, self.scale // 3))
+        self.weapon_img = pygame.transform.scale(self.weapon, (self.scale // 2, self.scale // 3))
 
     def run(self, frame_index):
         self.player = self.idling_frame_list[((frame_index // 7) % 6) + 4]
@@ -54,7 +56,7 @@ class Character(pygame.sprite.Sprite):
         self.player = pygame.transform.scale(self.player, (self.scale, self.scale))
         self.player_moustache = pygame.transform.scale(self.player_moustache, (self.scale, self.scale))
         self.player_shirt = pygame.transform.scale(self.player_shirt, (self.scale, self.scale))
-        self.weapon = pygame.transform.scale(self.weapon, (self.scale // 2, self.scale // 3))
+        self.weapon_img = pygame.transform.scale(self.weapon, (self.scale // 2, self.scale // 3))
 
     def move_right(self, game):
         tmp = self.Character_rect.copy()
