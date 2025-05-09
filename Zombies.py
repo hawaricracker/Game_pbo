@@ -19,7 +19,7 @@ class Zombie(pygame.sprite.Sprite):
             random.randint(0, map_height - self.image.get_height())
         ))
         self.speed = [0, 0]
-        self.acceleration = 5
+        self.acceleration = 0.75
         self.scale = 50
         self.idling(0)  # Initialize with idle animation
         self.dmg = 5 / 60
