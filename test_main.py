@@ -68,6 +68,27 @@ class TestFullGameRun(unittest.TestCase):
         self.assertTrue(character.Character_rect.x > 100, "Karakter harus bergerak ke kanan")
         self.assertGreaterEqual(len(game.bullets), 0, "Bullet list tidak boleh error")
         self.assertEqual(len(game.zombies), 5, "Zombie harus terload semua")
+        
+    def test_character_collision_with_house(self):
+        WIDTH, HEIGHT = 800, 600
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        game = Game(WIDTH, HEIGHT)
+        character = Character()
+
+        # Buat rumah dummy (objek persegi panjang)
+        house_rect = pygame.Rect(character.Character_rect.x + 20, character.Character_rect.y, 50, 50)
+        game.objects = [house_rect]
+
+        # Simulasikan gerakan ke kanan — akan tabrak rumah
+        old_rect = character.Character_rect.copy()
+        character.move_right(game)  # ini akan trigger check_house_collision()
+
+        # Harusnya posisi karakter dikembalikan ke old_rect
+        self.assertEqual(character.Character_rect, old_rect, "Karakter seharusnya tidak bisa menembus rumah.")
+
+        # Selain itu, akselerasi harus jadi 0 setelah tabrakan
+        self.assertEqual(character.acceleration, 0, "Akselerasi harus nol jika karakter menabrak objek.")
+
 
 if __name__ == "__main__":
     unittest.main()
