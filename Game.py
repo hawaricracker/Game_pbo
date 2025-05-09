@@ -70,13 +70,13 @@ class Game:
 
     def movement(self, character, keys):
         character.speed = [0, 0]
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_d]:
             character.move_right(self)
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_a]:
             character.move_left(self)
-        elif keys[pygame.K_UP]:
+        elif keys[pygame.K_w]:
             character.move_up(self)
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_s]:
             character.move_down(self)
 
     def animation(self, character):
