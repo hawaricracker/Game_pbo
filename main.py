@@ -1,5 +1,5 @@
 import pygame
-from win32api import GetSystemMetrics
+from win32api import GetSystemMetrics #Install pip win32api agar game berjalan pada fullscreen
 from Game import *
 from Character import *
 from Zombies import *
