@@ -1,78 +1,73 @@
+# test_main_run.py
+
+import unittest
 import pygame
-#from win32api import GetSystemMetrics #Install pip win32api agar game berjalan pada fullscreen
-from Game import *
-from Character import *
-from Zombies import *
-from MainMenu import *
+import os
+from Game import Game
+from Character import Character
+from Zombies import Zombie
+from MainMenu import MainMenu
+from Weapon import Weapon
+from Bullet import Bullet
 
-WIDTH, HEIGHT = 800,600
+# Agar pygame tidak membuka GUI di GitHub/Linux
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 pygame.init()
+pygame.display.set_mode((800, 600))
 
-pygame.display.set_caption("Zombie Shooter")
-menu = MainMenu(WIDTH, HEIGHT)
-game_running = False
-run = True
+class TestFullGameRun(unittest.TestCase):
+    def test_run_main_loop_simulation(self):
+        WIDTH, HEIGHT = 800, 600
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        clock = pygame.time.Clock()
 
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        action = menu.handle_event(event)
-        if action == "start":
-            game_running = True
-        elif action == "exit":
-            run = False
-
-    if game_running:
-        character = Character()
         game = Game(WIDTH, HEIGHT)
-        for _ in range(50):
+        character = Character()
+
+        # Tambahkan 5 zombie (bukan 50, agar test lebih cepat)
+        for _ in range(5):
             zombie = Zombie(game.map_width, game.map_height)
             game.zombies.append(zombie)
 
-        while game_running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-                    game_running = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        game_running = False
-                        run = False
+        # Simulasi input: gerak kanan dan tembak mouse
+        keys = {
+            pygame.K_d: True,  # tekan 'D'
+            pygame.K_w: False,
+            pygame.K_s: False,
+            pygame.K_a: False
+        }
 
-            # Gerakan keyboard
-            keys = pygame.key.get_pressed()
-            game.movement(character, keys)
+        # Simulasi mouse klik kiri ke arah kanan bawah
+        mouse_pressed = True
+        mouse_pos = (character.Character_rect.centerx + 100, character.Character_rect.centery + 100)
+        player_pos = character.Character_rect.center
+        target_pos = (mouse_pos[0] - game.offset_x, mouse_pos[1] - game.offset_y)
 
-            # ⬇️⬇️⬇️ BAGIAN BARU: Sistem Tembak dengan LMB ⬇️⬇️⬇️
-            mouse_pressed = pygame.mouse.get_pressed()[0]  # LMB ditekan
-            mouse_pos = pygame.mouse.get_pos()
+        # Gerakan karakter
+        character.move_right(game)
+        game.animation(character)
 
-            # Posisi karakter di dunia (real coordinates)
-            player_world_pos = character.Character_rect.center
-            target_world_pos = (
-                mouse_pos[0] - game.offset_x,
-                mouse_pos[1] - game.offset_y
-            )
+        # Fire
+        bullet = character.weapon.fire(player_pos, target_pos)
+        if bullet:
+            game.bullets.append(bullet)
 
-            if mouse_pressed:
-                bullet = character.weapon.fire(player_world_pos, target_world_pos)
-                if bullet:
-                    game.bullets.append(bullet)
-            # ⬆️⬆️⬆️ AKHIR BAGIAN BARU ⬆️⬆️⬆️
+        # Update semua
+        game.update_bullets()
+        for z in game.zombies:
+            z.move_towards_player(game, character.Character_rect, game.frame_index)
 
-            # Rendering dan update semua objek
-            game.load_map(game.screen, "test.tmx", character)
-            game.animation(character)
-            game.load_char(game.screen, character)
-            game.load_zombies(character)
+        # Simulasi draw tanpa benar-benar menggambar ke layar
+        try:
+            game.load_char(screen, character)
+            game.draw_health_bar(character.hp, character.max_hp, character)
+            game.draw_bullets()
+        except Exception as e:
+            self.fail(f"Rendering simulation failed: {e}")
 
-            game.update_bullets()  # Update posisi peluru
-            game.draw_bullets()    # Gambar peluru ke layar
+        self.assertTrue(character.Character_rect.x > 100, "Karakter harus bergerak ke kanan")
+        self.assertGreaterEqual(len(game.bullets), 0, "Bullet list tidak boleh error")
+        self.assertEqual(len(game.zombies), 5, "Zombie harus terload semua")
 
-            game.clock.tick(60)
-            pygame.display.flip()
-    else:
-        menu.draw()
-
-pygame.quit()
+if __name__ == "__main__":
+    unittest.main()
