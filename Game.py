@@ -1,5 +1,6 @@
 import pygame
 import pytmx
+from Bullet import Bullet  # ⬅ Tambahan: import Bullet untuk sistem peluru
 
 class Game:
     def __init__(self, width, height):
@@ -13,6 +14,8 @@ class Game:
         self.map_width = 0
         self.map_height = 0
         self.zombies = []
+        self.bullets = []  # ⬅ Tambahan: menyimpan semua peluru aktif dalam game
+
         # Load map dimensions immediately
         tmx_data = pytmx.load_pygame("test.tmx")
         self.map_width = tmx_data.width * tmx_data.tilewidth
@@ -27,8 +30,8 @@ class Game:
 
         # Load the Tiled map
         tmx_data = pytmx.load_pygame(filename)
-        self.map_width = tmx_data.width * tmx_data.tilewidth  # Total lebar peta
-        self.map_height = tmx_data.height * tmx_data.tileheight  # Total tinggi peta
+        self.map_width = tmx_data.width * tmx_data.tilewidth
+        self.map_height = tmx_data.height * tmx_data.tileheight
 
         # Render the map
         for layer in tmx_data.visible_layers:
@@ -44,25 +47,23 @@ class Game:
             if isinstance(layer, pytmx.TiledObjectGroup):
                 for obj in layer:
                     if obj.type == "House":
-                        # Store objects in world coordinates (without offset for collision)
                         obj_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
                         self.objects.append(obj_rect)
 
         self.frame_index += 1
-    
+
     def load_char(self, screen, char):
         self.check_zombie_collision(char)
-        # Render character at screen center (adjusted by offset in load_map)
         screen.blit(char.player, (self.WIDTH // 2 - char.player.get_width() // 2, self.HEIGHT // 2 - char.player.get_height() // 2))
         screen.blit(char.player_moustache, (self.WIDTH // 2 - char.player.get_width() // 2, self.HEIGHT // 2 - char.player.get_height() // 2))
         screen.blit(char.player_shirt, (self.WIDTH // 2 - char.player.get_width() // 2, self.HEIGHT // 2 - char.player.get_height() // 2))
-        screen.blit(char.weapon, (self.WIDTH // 2 - char.weapon.get_width() // 2 + 6, self.HEIGHT // 2 - char.weapon.get_height() // 2 + 10))
+        screen.blit(char.weapon_img, (self.WIDTH // 2 - char.weapon_img.get_width() // 2 + 6, self.HEIGHT // 2 - char.weapon_img.get_height() // 2 + 10))  # ⬅ Ganti dari weapon ke weapon_img
         self.draw_health_bar(char.hp, char.max_hp, char)
 
     def load_zombies(self, character):
         for zombie in self.zombies:
-            zombie.idling(self.frame_index)  # Update animation
-            zombie.move_towards_player(self, character.Character_rect, self.frame_index)  # Move towards player
+            zombie.idling(self.frame_index)
+            zombie.move_towards_player(self, character.Character_rect, self.frame_index)
             self.screen.blit(zombie.image, (
                 zombie.rect.x + self.offset_x,
                 zombie.rect.y + self.offset_y
@@ -84,7 +85,7 @@ class Game:
             character.idling(self.frame_index)
         else:
             character.run(self.frame_index)
-        
+
     def check_house_collision(self, character, tmp):
         for obj_rect in self.objects:
             if character.Character_rect.colliderect(obj_rect):
@@ -99,15 +100,23 @@ class Game:
                 character.hp -= zombie.dmg
 
     def draw_health_bar(self, hp, max_hp, char, width=30, height=6):
-        health_ratio = hp / max_hp  # hp/maxhp
-        
-        # Posisi kiri atas kotak health bar
+        health_ratio = hp / max_hp
         x = (self.WIDTH // 2) - width // 2
         y = (self.HEIGHT // 2) + char.player.get_height() // 2 + 3
-
-        # Gambar background (merah)
         pygame.draw.rect(self.screen, (200, 0, 0), (x, y, width, height))
-        # Gambar foreground (hijau) sesuai rasio
         pygame.draw.rect(self.screen, (0, 200, 0), (x, y, int(width * health_ratio), height))
-        # (Opsional) bingkai tipis
         pygame.draw.rect(self.screen, (0, 0, 0), (x, y, width, height), 1)
+
+    def update_bullets(self):  # ⬅ Tambahan: memperbarui posisi semua peluru
+        for bullet in self.bullets:
+            bullet.update()
+
+        # ⬅ Menghapus peluru yang keluar dari batas peta
+        self.bullets = [
+            b for b in self.bullets
+            if 0 <= b.x <= self.map_width and 0 <= b.y <= self.map_height
+        ]
+
+    def draw_bullets(self):  # ⬅ Tambahan: menggambar peluru ke layar
+        for bullet in self.bullets:
+            bullet.draw(self.screen, self.offset_x, self.offset_y)
