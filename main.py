@@ -1,10 +1,11 @@
 import pygame
+from win32api import GetSystemMetrics #Install pip win32api agar game berjalan pada fullscreen
 from Game import *
 from Character import *
 from Zombies import *
 from MainMenu import *
 
-WIDTH, HEIGHT = 50 * 16, 16 * 30
+WIDTH, HEIGHT = GetSystemMetrics(0), GetSystemMetrics(1)
 pygame.init()
 
 pygame.display.set_caption("Zombie Shooter")
