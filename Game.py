@@ -46,7 +46,7 @@ class Game:
         for layer in tmx_data.visible_layers:
             if isinstance(layer, pytmx.TiledObjectGroup):
                 for obj in layer:
-                    if obj.type == "House":
+                    if obj.type == "Obstacle":
                         obj_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
                         self.objects.append(obj_rect)
 
