@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="120" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="12">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="120" height="64" tilewidth="16" tileheight="16" infinite="0" nextlayerid="15" nextobjectid="31">
  <tileset firstgid="1" source="Trees.tsx"/>
  <tileset firstgid="33" source="BRINGIN.tsx"/>
  <tileset firstgid="42" source="House&amp;Props.tsx"/>
@@ -413,16 +413,35 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="3" name="Left Border" class="Obstacle" visible="0" locked="1">
+ <objectgroup id="3" name="Left Border" class="Obstacle" locked="1">
   <object id="2" name="Left_tree_border" type="Obstacle" x="-15.8333" y="-2.29167" width="70.2916" height="1030.46"/>
  </objectgroup>
- <objectgroup id="4" name="Top Border" class="Obstacle" visible="0" locked="1">
+ <objectgroup id="4" name="Top Border" class="Obstacle" locked="1">
   <object id="5" name="Top_tree_border" type="Obstacle" x="-12" y="-13.3333" width="1952" height="62.6667"/>
  </objectgroup>
- <objectgroup id="7" name="Right Border" class="Obstacle" visible="0" locked="1">
+ <objectgroup id="7" name="Right Border" class="Obstacle" locked="1">
   <object id="8" name="Right_tree_border" type="Obstacle" x="1864.33" y="-12.6667" width="75.6667" height="1046.67"/>
  </objectgroup>
- <objectgroup id="8" name="Bottom Border" class="Obstacle" visible="0" locked="1">
+ <objectgroup id="8" name="Bottom Border" class="Obstacle" locked="1">
   <object id="11" name="Bottom_tree_border" type="Obstacle" x="-7.33333" y="961.333" width="1945.33" height="75.6667"/>
+ </objectgroup>
+ <objectgroup id="12" name="House" class="Obstacle" locked="1">
+  <object id="12" name="House" type="Obstacle" x="783.938" y="239.938" width="48.0625" height="46.75"/>
+  <object id="15" name="House" type="Obstacle" x="847.938" y="240.031" width="48.0625" height="46.75"/>
+  <object id="16" name="House" type="Obstacle" x="912.014" y="240.009" width="48.0625" height="46.75"/>
+  <object id="17" name="House" type="Obstacle" x="912.038" y="304.001" width="48.0625" height="46.75"/>
+  <object id="18" name="House" type="Obstacle" x="848.027" y="303.979" width="48.0625" height="46.75"/>
+  <object id="19" name="House" type="Obstacle" x="784.059" y="304.126" width="48.0625" height="46.75"/>
+  <object id="20" name="House" type="Obstacle" x="479.944" y="143.943" width="48.0625" height="46.75"/>
+  <object id="21" name="House" type="Obstacle" x="111.853" y="272.216" width="48.0625" height="46.75"/>
+  <object id="22" name="House" type="Obstacle" x="367.853" y="511.966" width="48.0625" height="46.75"/>
+  <object id="23" name="House" type="Obstacle" x="815.853" y="688.153" width="48.0625" height="46.75"/>
+  <object id="24" name="House" type="Obstacle" x="287.937" y="816.216" width="48.0625" height="46.75"/>
+  <object id="25" name="House" type="Obstacle" x="1359.88" y="415.965" width="48.0625" height="46.75"/>
+  <object id="26" name="House" type="Obstacle" x="1487.9" y="192.049" width="48.0625" height="46.75"/>
+  <object id="27" name="House" type="Obstacle" x="1552.08" y="192.049" width="48.0625" height="46.75"/>
+  <object id="28" name="House" type="Obstacle" x="1551.83" y="815.924" width="48.0625" height="46.75"/>
+  <object id="29" name="House" type="Obstacle" x="1615.9" y="816.005" width="48.0625" height="46.75"/>
+  <object id="30" name="House" type="Obstacle" x="1679.97" y="816.068" width="48.0625" height="46.75"/>
  </objectgroup>
 </map>
