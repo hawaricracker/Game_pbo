@@ -17,7 +17,7 @@ class Game:
         self.bullets = []  # ⬅ Tambahan: menyimpan semua peluru aktif dalam game
 
         # Load map dimensions immediately
-        tmx_data = pytmx.load_pygame("test.tmx")
+        tmx_data = pytmx.load_pygame("Asset/MAP/map1.tmx")
         self.map_width = tmx_data.width * tmx_data.tilewidth
         self.map_height = tmx_data.height * tmx_data.tileheight
 

@@ -62,7 +62,7 @@ while run:
             # ⬆️⬆️⬆️ AKHIR BAGIAN BARU ⬆️⬆️⬆️
 
             # Rendering dan update semua objek
-            game.load_map(game.screen, "map1.tmx", character)
+            game.load_map(game.screen, "Asset/MAP/map1.tmx", character)
             game.animation(character)
             game.load_char(game.screen, character)
             game.load_zombies(character)
