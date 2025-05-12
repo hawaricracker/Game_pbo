@@ -66,7 +66,6 @@ while run:
             game.animation(character)
             game.load_char(game.screen, character)
             game.load_zombies(character)
-
             game.update_bullets()  # Update posisi peluru
             game.draw_bullets()    # Gambar peluru ke layar
 

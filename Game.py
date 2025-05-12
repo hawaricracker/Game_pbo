@@ -1,6 +1,6 @@
 import pygame
 import pytmx
-from Bullet import Bullet  # ⬅ Tambahan: import Bullet untuk sistem peluru
+from Bullet import *  # ⬅ Tambahan: import Bullet untuk sistem peluru
 
 class Game:
     def __init__(self, width, height):
@@ -53,7 +53,7 @@ class Game:
         self.frame_index += 1
 
     def load_char(self, screen, char):
-        self.check_zombie_collision(char)
+        self.char_check_zombie_collision(char)
         screen.blit(char.player, (self.WIDTH // 2 - char.player.get_width() // 2, self.HEIGHT // 2 - char.player.get_height() // 2))
         screen.blit(char.player_moustache, (self.WIDTH // 2 - char.player.get_width() // 2, self.HEIGHT // 2 - char.player.get_height() // 2))
         screen.blit(char.player_shirt, (self.WIDTH // 2 - char.player.get_width() // 2, self.HEIGHT // 2 - char.player.get_height() // 2))
@@ -86,15 +86,21 @@ class Game:
         else:
             character.run(self.frame_index)
 
-    def check_house_collision(self, character, tmp):
+    def check_collision(self, obj, obstacle):
+        if obj.colliderect(obstacle):
+            return True
+        return False
+    
+    def char_check_house_collision(self, character, tmp):
         for obj_rect in self.objects:
-            if character.Character_rect.colliderect(obj_rect):
+            if self.check_collision(character.Character_rect, obj_rect):
                 character.Character_rect = tmp
                 character.acceleration = 0
-                return
+                return 1
         character.acceleration = 5
+        return 0
 
-    def check_zombie_collision(self, character):
+    def char_check_zombie_collision(self, character):
         for zombie in self.zombies:
             if character.Character_rect.colliderect(zombie.rect):
                 character.hp -= zombie.dmg
@@ -107,16 +113,45 @@ class Game:
         pygame.draw.rect(self.screen, (0, 200, 0), (x, y, int(width * health_ratio), height))
         pygame.draw.rect(self.screen, (0, 0, 0), (x, y, width, height), 1)
 
-    def update_bullets(self):  # ⬅ Tambahan: memperbarui posisi semua peluru
+    def update_bullets(self):
         for bullet in self.bullets:
-            bullet.update()
+            if bullet.collided:
+                bullet.update_frame()  # Hanya update animasi jika sudah menabrak
+                continue
+            bullet_rect = bullet.get_rect()
+            for obj_rect in self.objects:
+                if self.check_collision(bullet_rect, obj_rect):
+                    bullet.collided = True  # Tandai sebagai menabrak
+                    bullet.update_frame()
+                    break
+            else:
+                bullet.update_pos()  # Update posisi jika tidak menabrak
+                bullet.update_frame()
 
-        # ⬅ Menghapus peluru yang keluar dari batas peta
+        # Menghapus peluru yang keluar dari batas peta
         self.bullets = [
             b for b in self.bullets
             if 0 <= b.x <= self.map_width and 0 <= b.y <= self.map_height
         ]
 
-    def draw_bullets(self):  # ⬅ Tambahan: menggambar peluru ke layar
+    def draw_bullets(self):
+        bullets_to_remove = []
         for bullet in self.bullets:
-            bullet.draw(self.screen, self.offset_x, self.offset_y)
+            bullet_rect = bullet.get_rect()
+            collided = False
+            for obj_rect in self.objects:
+                if self.check_collision(bullet_rect, obj_rect):
+                    if not bullet.collided:  # Reset animasi saat pertama kali menabrak
+                        bullet.frame_index = 0
+                    bullet.collided = True  # Tandai sebagai menabrak
+                    bullet.draw_collision(self.screen, self.offset_x, self.offset_y)
+                    collided = True
+                    # Tandai peluru untuk dihapus setelah animasi selesai
+                    if bullet.frame_index >= len(bullet.bullet_frame_list) - 1:
+                        bullets_to_remove.append(bullet)
+                    break
+            if not collided:
+                bullet.draw_normal(self.screen, self.offset_x, self.offset_y)
+        # Hapus peluru yang sudah selesai animasi
+        for bullet in bullets_to_remove:
+            self.bullets.remove(bullet)

@@ -62,28 +62,28 @@ class Character(pygame.sprite.Sprite):
         self.Character_rect.x += self.acceleration
         self.restrict_to_map_bounds(game)
         self.speed[0] = 1
-        game.check_house_collision(self, tmp)
+        game.char_check_house_collision(self, tmp)
 
     def move_left(self, game):
         tmp = self.Character_rect.copy()
         self.Character_rect.x -= self.acceleration
         self.restrict_to_map_bounds(game)
         self.speed[0] = 1
-        game.check_house_collision(self, tmp)
+        game.char_check_house_collision(self, tmp)
 
     def move_up(self, game):
         tmp = self.Character_rect.copy()
         self.Character_rect.y -= self.acceleration
         self.restrict_to_map_bounds(game)
         self.speed[1] = 1
-        game.check_house_collision(self, tmp)
+        game.char_check_house_collision(self, tmp)
 
     def move_down(self, game):
         tmp = self.Character_rect.copy()
         self.Character_rect.y += self.acceleration
         self.restrict_to_map_bounds(game)
         self.speed[1] = 1
-        game.check_house_collision(self, tmp)
+        game.char_check_house_collision(self, tmp)
     
     def restrict_to_map_bounds(self, game):
         # Batasi posisi karakter agar tetap dalam peta
