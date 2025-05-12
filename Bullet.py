@@ -11,7 +11,7 @@ class Bullet:
         self.damage = 10
         self.radius = 5
         self.color = (255, 255, 0)
-        self.bullet = pygame.image.load("/Asset/PNG/Bullet.png")
+        self.bullet = pygame.image.load("Asset/PNG/Bullet.png")
         self.bullet_frame_list = []
         self.frame_index = 0
         self.animation_speed = 0.4
