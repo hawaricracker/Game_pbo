@@ -27,7 +27,7 @@ while run:
         character = Character()
         game = Game(WIDTH, HEIGHT)
         for _ in range(50):
-            zombie = Zombie(game.map_width, game.map_height)
+            zombie = Zombie(game.map_width, game.map_height, game.objects)
             game.zombies.append(zombie)
 
         while game_running:

@@ -21,6 +21,13 @@ class Game:
         self.map_width = tmx_data.width * tmx_data.tilewidth
         self.map_height = tmx_data.height * tmx_data.tileheight
 
+        for layer in tmx_data.visible_layers:
+            if isinstance(layer, pytmx.TiledObjectGroup):
+                for obj in layer:
+                    if obj.type == "Obstacle":
+                        obj_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+                        self.objects.append(obj_rect)
+
     def load_map(self, screen, filename, character):
         screen.fill((0, 0, 0))
 

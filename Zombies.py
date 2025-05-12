@@ -2,7 +2,7 @@ import pygame
 import random
 
 class Zombie(pygame.sprite.Sprite):
-    def __init__(self, map_width, map_height):
+    def __init__(self, map_width, map_height, objects):
         pygame.sprite.Sprite.__init__(self)
         self.zombie_frame_list = []
         
@@ -13,15 +13,25 @@ class Zombie(pygame.sprite.Sprite):
                 self.zombie_frame_list.append(frame)
 
         self.image = self.zombie_frame_list[0]
-        # Set random spawn position in world coordinates
-        self.rect = self.image.get_rect(topleft=(
-            random.randint(0, map_width - self.image.get_width()),
-            random.randint(0, map_height - self.image.get_height())
-        ))
+        
+        # Set random spawn position with collision check
+        valid_position = False
+        while not valid_position:
+            self.rect = self.image.get_rect(topleft=(
+                random.randint(0, map_width - self.image.get_width()),
+                random.randint(0, map_height - self.image.get_height())
+            ))
+            valid_position = True
+            # Periksa apakah rect zombie bertabrakan dengan objects
+            for obj_rect in objects:
+                if self.rect.colliderect(obj_rect):
+                    valid_position = False
+                    break
+        
         self.speed = [0, 0]
         self.acceleration = 0.75
         self.scale = 50
-        self.idling(0)  # Initialize with idle animation
+        self.idling(0)
         self.dmg = 5 / 60
         self.speed = 3
 
