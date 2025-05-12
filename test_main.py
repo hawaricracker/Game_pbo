@@ -26,7 +26,7 @@ class TestFullGameRun(unittest.TestCase):
 
         # Tambahkan 5 zombie (bukan 50, agar test lebih cepat)
         for _ in range(5):
-            zombie = Zombie(game.map_width, game.map_height)
+            zombie = Zombie(game.map_width, game.map_height, game.objects)
             game.zombies.append(zombie)
 
         # Simulasi input: gerak kanan dan tembak mouse
