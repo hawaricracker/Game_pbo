@@ -12,6 +12,7 @@ pygame.display.set_caption("Zombie Shooter")
 menu = MainMenu(WIDTH, HEIGHT)
 game_running = False
 run = True
+zombie = 50
 
 while run:
     for event in pygame.event.get():
@@ -26,7 +27,7 @@ while run:
     if game_running:
         character = Character()
         game = Game(WIDTH, HEIGHT)
-        for _ in range(50):
+        for _ in range(zombie):
             zombie = Zombie(game.map_width, game.map_height, game.objects)
             game.zombies.append(zombie)
 

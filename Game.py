@@ -75,6 +75,7 @@ class Game:
                 zombie.rect.x + self.offset_x,
                 zombie.rect.y + self.offset_y
             ))
+            self.draw_health_bar(zombie.hp, zombie.max_hp, zombie)
 
     def movement(self, character, keys):
         character.speed = [0, 0]
@@ -112,28 +113,27 @@ class Game:
             if character.Character_rect.colliderect(zombie.rect):
                 character.hp -= zombie.dmg
 
-    def draw_health_bar(self, hp, max_hp, char, width=30, height=6):
+    def draw_health_bar(self, hp, max_hp, entity, width=30, height=6):
         health_ratio = hp / max_hp
-        x = (self.WIDTH // 2) - width // 2
-        y = (self.HEIGHT // 2) + char.player.get_height() // 2 + 3
+        
+        # Tentukan posisi health bar berdasarkan jenis entitas
+        if hasattr(entity, 'Character_rect'):  # Untuk karakter
+            x = (self.WIDTH // 2) - width // 2
+            y = (self.HEIGHT // 2) + entity.player.get_height() // 2 + 3
+        else:  # Untuk zombie
+            x = 8 + entity.rect.centerx + self.offset_x - width // 2
+            y = entity.rect.bottom + self.offset_y + 15
+        
+        # Gambar health bar
         pygame.draw.rect(self.screen, (200, 0, 0), (x, y, width, height))
         pygame.draw.rect(self.screen, (0, 200, 0), (x, y, int(width * health_ratio), height))
         pygame.draw.rect(self.screen, (0, 0, 0), (x, y, width, height), 1)
 
     def update_bullets(self):
         for bullet in self.bullets:
-            if bullet.collided:
-                bullet.update_frame()  # Hanya update animasi jika sudah menabrak
-                continue
-            bullet_rect = bullet.get_rect()
-            for obj_rect in self.objects:
-                if self.check_collision(bullet_rect, obj_rect):
-                    bullet.collided = True  # Tandai sebagai menabrak
-                    bullet.update_frame()
-                    break
-            else:
-                bullet.update_pos()  # Update posisi jika tidak menabrak
-                bullet.update_frame()
+            if not bullet.collided:
+                bullet.update_pos()  # Update posisi jika belum menabrak
+            bullet.update_frame()  # Update frame animasi
 
         # Menghapus peluru yang keluar dari batas peta
         self.bullets = [
@@ -143,22 +143,43 @@ class Game:
 
     def draw_bullets(self):
         bullets_to_remove = []
+        zombies_to_remove = []  # Daftar untuk zombie yang HP-nya <= 0
+        
         for bullet in self.bullets:
             bullet_rect = bullet.get_rect()
-            collided = False
-            for obj_rect in self.objects:
-                if self.check_collision(bullet_rect, obj_rect):
-                    if not bullet.collided:  # Reset animasi saat pertama kali menabrak
-                        bullet.frame_index = 0
-                    bullet.collided = True  # Tandai sebagai menabrak
-                    bullet.draw_collision(self.screen, self.offset_x, self.offset_y)
-                    collided = True
-                    # Tandai peluru untuk dihapus setelah animasi selesai
-                    if bullet.frame_index >= len(bullet.bullet_frame_list) - 1:
-                        bullets_to_remove.append(bullet)
-                    break
-            if not collided:
+            
+            # Jika peluru belum menabrak, periksa kolisi
+            if not bullet.collided:
+                obj_list = self.objects.copy() + [z.rect for z in self.zombies]
+                for i, obj_rect in enumerate(obj_list):
+                    if self.check_collision(bullet_rect, obj_rect):
+                        bullet.collided = True  # Tandai sebagai menabrak
+                        bullet.frame_index = 0  # Reset animasi saat pertama kali menabrak
+                        
+                        # Jika menabrak zombie, kurangi HP
+                        if i >= len(self.objects):  # Artinya menabrak zombie
+                            zombie_index = i - len(self.objects)
+                            zombie = self.zombies[zombie_index]
+                            zombie.hp -= bullet.damage  # Kurangi HP zombie
+                            if zombie.hp <= 0:
+                                zombies_to_remove.append(zombie)  # Tandai untuk dihapus
+                        break
+            
+            # Gambar peluru berdasarkan status collided
+            if bullet.collided:
+                bullet.draw_collision(self.screen, self.offset_x, self.offset_y)
+                bullet.update_frame()
+                # Tandai peluru untuk dihapus setelah animasi selesai
+                if bullet.frame_index >= len(bullet.bullet_frame_list) - 1:
+                    bullets_to_remove.append(bullet)
+            else:
                 bullet.draw_normal(self.screen, self.offset_x, self.offset_y)
+        
         # Hapus peluru yang sudah selesai animasi
         for bullet in bullets_to_remove:
             self.bullets.remove(bullet)
+        
+        # Hapus zombie yang HP-nya <= 0
+        for zombie in zombies_to_remove[:]:  # Iterate over a copy to avoid modification during iteration
+            if zombie in self.zombies:  # Ensure the zombie is still in the list
+                self.zombies.remove(zombie)

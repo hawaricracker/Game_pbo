@@ -14,7 +14,7 @@ class Bullet:
         self.bullet = pygame.image.load("Asset/PNG/Bullet.png")
         self.bullet_frame_list = []
         self.frame_index = 0
-        self.animation_speed = 0.4
+        self.animation_speed = 1.2
         self.collided = False
         # Hitung sudut arah peluru (dalam derajat)
         self.angle = math.degrees(math.atan2(-dy, dx))  # Negatif dy untuk orientasi Pygame

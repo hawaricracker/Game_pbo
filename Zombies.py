@@ -34,6 +34,8 @@ class Zombie(pygame.sprite.Sprite):
         self.idling(0)
         self.dmg = 5 / 60
         self.speed = 3
+        self.hp = 100
+        self.max_hp = 100
 
     def idling(self, frame_index):
         self.image = self.zombie_frame_list[(frame_index // 7) % 4]

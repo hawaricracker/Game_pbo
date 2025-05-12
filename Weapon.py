@@ -4,7 +4,7 @@ import time
 
 class Weapon:
     def __init__(self):
-        self.fire_rate = 0.5  # detik antar tembakan (5 peluru per detik)
+        self.fire_rate = 0.001  # detik antar tembakan (5 peluru per detik)
         self.bullet_speed = 10
         self.last_shot_time = 0
 
