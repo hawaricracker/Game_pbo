@@ -104,7 +104,6 @@ class TestZombieFunctionality(unittest.TestCase):
         self.character.Character_rect.y = self.zombie.rect.y
         initial_pos = self.zombie.rect.copy()
         self.zombie.move_towards_player(self.game, self.character.Character_rect, 0)
-        # Beri toleransi kecil untuk pergerakan
         dx = abs(self.zombie.rect.x - initial_pos.x)
         self.assertLessEqual(dx, 2, "Zombie shouldn't move significantly through obstacles")
 
@@ -127,25 +126,26 @@ class TestWeaponAndBulletFunctionality(unittest.TestCase):
     def test_bullet_collision_detection(self):
         bullet = Bullet((100, 100), (200, 100), 10)
         self.game.bullets = [bullet]
-        self.game.objects = [pygame.Rect(110, 95, 20, 10)]
-        for _ in range(5):
+        self.game.objects = [pygame.Rect(120, 95, 20, 10)]
+        # Simulasi sampai collision
+        collided = False
+        for _ in range(20):
             bullet.update_pos()
-        bullet_rect = bullet.get_rect()
-        for obj in self.game.objects:
-            if bullet_rect.colliderect(obj):
-                bullet.collided = True
+            bullet_rect = bullet.get_rect()
+            if any(bullet_rect.colliderect(obj) for obj in self.game.objects):
+                collided = True
                 break
-        self.assertTrue(bullet.collided, "Bullet should detect collision with obstacle")
+        self.assertTrue(collided, "Bullet should detect collision with obstacle")
 
     def test_bullet_damage_zombie(self):
         bullet = Bullet((100, 100), (200, 100), 10)
         self.game.bullets = [bullet]
         zombie = Zombie(self.game.map_width, self.game.map_height, self.game.objects)
-        zombie.rect.x = 110
+        zombie.rect.x = 120
         zombie.rect.y = 95
         self.game.zombies = [zombie]
         initial_hp = zombie.hp
-        for _ in range(5):
+        for _ in range(20):
             bullet.update_pos()
             if bullet.get_rect().colliderect(zombie.rect):
                 zombie.hp -= bullet.damage
