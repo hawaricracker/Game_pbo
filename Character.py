@@ -1,4 +1,5 @@
 import pygame
+import time
 from Weapon import Weapon
 #class player
 class Character(pygame.sprite.Sprite):
@@ -12,6 +13,9 @@ class Character(pygame.sprite.Sprite):
         self.player_moustache = pygame.image.load("zombie/ZombieShooter/Sprites/Character/Moustach/Moustach1.png")
         self.player_shirt = pygame.image.load("zombie/ZombieShooter/Sprites/Character/Shirt/Shirt1.png")
         self.weapon_img = pygame.image.load("zombie/ZombieShooter/Sprites/Objects&Tiles/Weapons.png")
+
+        
+
 
         for y in range(self.player.get_height() // 32):
             for x in range(self.player.get_width() // 32):
@@ -33,11 +37,36 @@ class Character(pygame.sprite.Sprite):
         # Set initial spawn position in world coordinates
         self.Character_rect = self.player.get_rect(topleft=(100, 100))  # Adjust to avoid house collision
         self.speed = [0, 0]
+        
         self.acceleration = 10
+        self.normal_speed = self.acceleration  # Simpan kecepatan normal
+        self.dash_speed = 75        # Kecepatan saat dash
+        self.is_dashing = False     # Status dash sedang aktif atau tidak
+        self.dash_duration = 0.2    # Lama dash dalam detik
+        self.dash_cooldown = 5.0    # Delay cooldown dalam detik
+        self.dash_time = 0          # Waktu terakhir dash aktif (timestamp)
+        self.last_dash_time = -999  # Waktu terakhir dash dipakai (timestamp)
+
         self.scale = 50
         self.hp = 100
         self.max_hp = 100
         self.weapon = Weapon() 
+
+    def start_dash(self):
+        current_time = time.time()
+        if current_time - self.last_dash_time >= self.dash_cooldown:
+            self.is_dashing = True
+            self.dash_time = current_time
+            self.last_dash_time = current_time
+            self.acceleration = self.dash_speed
+
+    def update_dash(self):
+        if self.is_dashing:
+            current_time = time.time()
+            if current_time - self.dash_time >= self.dash_duration:
+                self.is_dashing = False
+                self.acceleration = self.normal_speed
+    
     
     def idling(self, frame_index):
         self.player = self.idling_frame_list[(frame_index // 7) % 4]
