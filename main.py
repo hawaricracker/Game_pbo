@@ -68,6 +68,8 @@ while run:
                 # Gerakan keyboard
                 keys = pygame.key.get_pressed()
                 game.movement(character, keys)
+                character.update_dash()
+                game.check_dash_collision_with_zombies(character)
                 
                 # Sistem Tembak dengan LMB
                 mouse_pressed = pygame.mouse.get_pressed()[0]
