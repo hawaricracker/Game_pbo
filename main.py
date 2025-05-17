@@ -40,6 +40,9 @@ while run:
                     if event.key == pygame.K_ESCAPE:
                         game_running = False
                         run = False
+                    elif event.key == pygame.K_LSHIFT:
+                        character.start_dash()   # Trigger dash saat Shift kiri ditekan
+    
 
             # Gerakan keyboard
             keys = pygame.key.get_pressed()
