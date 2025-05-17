@@ -39,13 +39,14 @@ class Character(pygame.sprite.Sprite):
         self.speed = [0, 0]
         
         self.acceleration = 10
-        self.normal_speed = self.acceleration  # Simpan kecepatan normal
-        self.dash_speed = 75        # Kecepatan saat dash
-        self.is_dashing = False     # Status dash sedang aktif atau tidak
-        self.dash_duration = 0.2    # Lama dash dalam detik
-        self.dash_cooldown = 5.0    # Delay cooldown dalam detik
-        self.dash_time = 0          # Waktu terakhir dash aktif (timestamp)
-        self.last_dash_time = -999  # Waktu terakhir dash dipakai (timestamp)
+        self.normal_speed = self.acceleration   # Simpan kecepatan normal
+        self.dash_speed = 15                    # Kecepatan saat dash
+        self.is_dashing = False                 # Status dash sedang aktif atau tidak
+        self.dash_just_started = False          # Menandai bahwa dash baru saja dimulai
+        self.dash_duration = 0.2                # Lama dash dalam detik
+        self.dash_cooldown = 5.0                # Delay cooldown dalam detik
+        self.dash_time = 0                      # Waktu terakhir dash aktif (timestamp)
+        self.last_dash_time = -999              # Waktu terakhir dash dipakai (timestamp)
 
         self.scale = 50
         self.hp = 100
@@ -56,6 +57,7 @@ class Character(pygame.sprite.Sprite):
         current_time = time.time()
         if current_time - self.last_dash_time >= self.dash_cooldown:
             self.is_dashing = True
+            self.dash_just_started = True
             self.dash_time = current_time
             self.last_dash_time = current_time
             self.acceleration = self.dash_speed
