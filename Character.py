@@ -38,7 +38,7 @@ class Character(pygame.sprite.Sprite):
         self.Character_rect = self.player.get_rect(topleft=(100, 100))  # Adjust to avoid house collision
         self.speed = [0, 0]
         
-        self.acceleration = 0
+        self.acceleration = 10
         self.normal_speed = self.acceleration  # Simpan kecepatan normal
         self.dash_speed = 75        # Kecepatan saat dash
         self.is_dashing = False     # Status dash sedang aktif atau tidak
