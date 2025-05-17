@@ -4,6 +4,10 @@ import math
 class Bullet:
     def __init__(self, start_pos, target_pos, speed):
         self.x, self.y = start_pos
+        self.start_x, self.start_y = start_pos  #posisi awal bullet
+        self.max_range = 300  #radius maksimal bullet
+
+
         dx, dy = target_pos[0] - self.x, target_pos[1] - self.y
         distance = math.hypot(dx, dy)
         self.vel_x = speed * dx / distance
@@ -61,3 +65,7 @@ class Bullet:
 
     def get_rect(self):
         return pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius * 2, self.radius * 2)
+    
+    def has_exceeded_range(self): #fungsi jarak maksimal radius bullet
+        distance_travelled = math.hypot(self.x - self.start_x, self.y - self.start_y)
+        return distance_travelled >= self.max_range
