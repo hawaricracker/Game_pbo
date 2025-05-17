@@ -12,7 +12,9 @@ pygame.display.set_caption("Zombie Shooter")
 menu = MainMenu(WIDTH, HEIGHT)
 game_running = False
 run = True
-zombie = 50
+num_zombies = 50
+game_over = False
+victory = False
 
 while run:
     for event in pygame.event.get():
@@ -27,9 +29,11 @@ while run:
     if game_running:
         character = Character()
         game = Game(WIDTH, HEIGHT)
-        for _ in range(zombie):
-            zombie = Zombie(game.map_width, game.map_height, game.objects)
-            game.zombies.append(zombie)
+        game_over = False
+        victory = False
+        for _ in range(num_zombies):
+            new_zombie = Zombie(game.map_width, game.map_height, game.objects)
+            game.zombies.append(new_zombie)
 
         while game_running:
             for event in pygame.event.get():
@@ -38,41 +42,56 @@ while run:
                     game_running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        game_running = False
-                        run = False
-                    elif event.key == pygame.K_LSHIFT:
-                        character.start_dash()   # Trigger dash saat Shift kiri ditekan
-    
-
-            # Gerakan keyboard
-            keys = pygame.key.get_pressed()
-            game.movement(character, keys)
-
-            # ⬇️⬇️⬇️ BAGIAN BARU: Sistem Tembak dengan LMB ⬇️⬇️⬇️
-            mouse_pressed = pygame.mouse.get_pressed()[0]  # LMB ditekan
-            mouse_pos = pygame.mouse.get_pos()
-
-            # Posisi karakter di dunia (real coordinates)
-            player_world_pos = character.Character_rect.center
-            target_world_pos = (
-                mouse_pos[0] - game.offset_x,
-                mouse_pos[1] - game.offset_y
-            )
-
-            if mouse_pressed:
-                bullet = character.weapon.fire(player_world_pos, target_world_pos)
-                if bullet:
-                    game.bullets.append(bullet)
-            # ⬆️⬆️⬆️ AKHIR BAGIAN BARU ⬆️⬆️⬆️
-
-            # Rendering dan update semua objek
-            game.load_map(game.screen, "Asset/MAP/map1.tmx", character)
-            game.animation(character)
-            game.load_char(game.screen, character)
-            game.load_zombies(character)
-            game.update_bullets()  # Update posisi peluru
-            game.draw_bullets()    # Gambar peluru ke layar
-
+                        if game_over or victory:
+                            game_running = False  # Kembali ke menu utama
+                        else:
+                            game_running = False
+                            run = False
+                    elif event.key == pygame.K_LSHIFT and not game_over and not victory:
+                        character.start_dash()
+            
+            # Periksa kondisi menang (semua zombie sudah dikalahkan)
+            if len(game.zombies) == 0 and not game_over:
+                victory = True
+            
+            # Periksa jika karakter masih hidup
+            if character.hp <= 0:
+                game_over = True
+            
+            if game_over:
+                # Tampilkan layar game over dan tunggu input
+                game.show_game_over()
+            elif victory:
+                # Tampilkan layar kemenangan dan tunggu input
+                game.show_victory()
+            else:
+                # Gerakan keyboard
+                keys = pygame.key.get_pressed()
+                game.movement(character, keys)
+                
+                # Sistem Tembak dengan LMB
+                mouse_pressed = pygame.mouse.get_pressed()[0]
+                mouse_pos = pygame.mouse.get_pos()
+                
+                player_world_pos = character.Character_rect.center
+                target_world_pos = (
+                    mouse_pos[0] - game.offset_x,
+                    mouse_pos[1] - game.offset_y
+                )
+                
+                if mouse_pressed:
+                    bullet = character.weapon.fire(player_world_pos, target_world_pos)
+                    if bullet:
+                        game.bullets.append(bullet)
+                
+                # Rendering dan update semua objek
+                game.load_map(game.screen, "Asset/MAP/map1.tmx", character)
+                game.animation(character)
+                game.load_char(game.screen, character)
+                game.load_zombies(character)
+                game.update_bullets()
+                game.draw_bullets()
+            
             game.clock.tick(60)
             pygame.display.flip()
     else:

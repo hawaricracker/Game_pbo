@@ -112,6 +112,7 @@ class Game:
         for zombie in self.zombies:
             if character.Character_rect.colliderect(zombie.rect):
                 character.hp -= zombie.dmg
+                character.hp = max(0, character.hp)  # Pastikan HP tidak negatif
 
     def draw_health_bar(self, hp, max_hp, entity, width=30, height=6):
         health_ratio = hp / max_hp
@@ -183,3 +184,41 @@ class Game:
         for zombie in zombies_to_remove[:]:  # Iterate over a copy to avoid modification during iteration
             if zombie in self.zombies:  # Ensure the zombie is still in the list
                 self.zombies.remove(zombie)
+
+    def show_game_over(self):
+        # Menampilkan layar game over
+        self.screen.fill((0, 0, 0))  # Background hitam
+        
+        # Teks game over
+        font = pygame.font.Font(None, 74)
+        game_over_text = font.render("GAME OVER", True, (255, 0, 0))
+        game_over_rect = game_over_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 - 50))
+        
+        # Instruksi keluar
+        small_font = pygame.font.Font(None, 36)
+        exit_text = small_font.render("Press ESC to return to main menu", True, (255, 255, 255))
+        exit_rect = exit_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 + 50))
+        
+        # Tampilkan teks
+        self.screen.blit(game_over_text, game_over_rect)
+        self.screen.blit(exit_text, exit_rect)
+        pygame.display.flip()
+
+    def show_victory(self):
+        # Menampilkan layar kemenangan
+        self.screen.fill((0, 0, 0))  # Background hitam
+        
+        # Teks kemenangan
+        font = pygame.font.Font(None, 74)
+        victory_text = font.render("YOU WIN!", True, (0, 255, 0))
+        victory_rect = victory_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 - 50))
+        
+        # Instruksi keluar
+        small_font = pygame.font.Font(None, 36)
+        exit_text = small_font.render("Press ESC to return to main menu", True, (255, 255, 255))
+        exit_rect = exit_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 + 50))
+        
+        # Tampilkan teks
+        self.screen.blit(victory_text, victory_rect)
+        self.screen.blit(exit_text, exit_rect)
+        pygame.display.flip()

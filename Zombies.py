@@ -32,7 +32,7 @@ class Zombie(pygame.sprite.Sprite):
         self.acceleration = 0.75
         self.scale = 50
         self.idling(0)
-        self.dmg = 5 / 60
+        self.dmg = 10 / 60
         self.speed = 3
         self.hp = 100
         self.max_hp = 100
