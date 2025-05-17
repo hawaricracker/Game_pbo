@@ -135,10 +135,10 @@ class Game:
                 bullet.update_pos()  # Update posisi jika belum menabrak
             bullet.update_frame()  # Update frame animasi
 
-        # Menghapus peluru yang keluar dari batas peta
+        # Menghapus peluru yang keluar dari jangkauan bullet
         self.bullets = [
             b for b in self.bullets
-            if 0 <= b.x <= self.map_width and 0 <= b.y <= self.map_height
+            if 0 <= b.x <= self.map_width and 0 <= b.y <= self.map_height and not b.has_exceeded_range()
         ]
 
     def draw_bullets(self):
