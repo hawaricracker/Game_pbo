@@ -185,6 +185,36 @@ class Game:
             if zombie in self.zombies:  # Ensure the zombie is still in the list
                 self.zombies.remove(zombie)
 
+    
+    def check_dash_collision_with_zombies(self, character):
+        if not character.is_dashing or not character.dash_just_started:
+            return
+
+
+        for zombie in self.zombies:
+            if character.Character_rect.colliderect(zombie.rect):
+            # Hitung arah dorongan
+                dx = zombie.rect.centerx - character.Character_rect.centerx
+                dy = zombie.rect.centery - character.Character_rect.centery
+                distance = math.hypot(dx, dy)
+                if distance == 0:
+                    continue
+
+                push_strength = 30  # Jarak dorongan
+                dx /= distance
+                dy /= distance
+
+                # Dorong zombie menjauh dari player
+                zombie.rect.x += int(dx * push_strength)
+                zombie.rect.y += int(dy * push_strength)
+
+                # (Opsional) Kurangi HP zombie
+                zombie.hp -= 5  # Bisa disesuaikan
+        
+        character.dash_just_started = False        
+
+
+
     def show_game_over(self):
         # Menampilkan layar game over
         self.screen.fill((0, 0, 0))  # Background hitam
