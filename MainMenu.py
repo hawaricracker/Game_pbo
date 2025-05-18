@@ -15,7 +15,7 @@ class MainMenu:
 
     def setup_menu(self):
         # Judul
-        title_text = self.font.render("Zombie Shooter", True, (255, 255, 255))
+        title_text = self.font.render("Gen-Z Slayer: Z is for Zombies!", True, (255, 255, 255))
         title_rect = title_text.get_rect(center=(self.width // 2, self.height // 4))
 
         # Tombol Start

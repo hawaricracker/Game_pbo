@@ -4,15 +4,16 @@ from Game import *
 from Character import *
 from Zombies import *
 from MainMenu import *
+from Boss import *
 
 WIDTH, HEIGHT = GetSystemMetrics(0), GetSystemMetrics(1)
 pygame.init()
 
-pygame.display.set_caption("Zombie Shooter")
+pygame.display.set_caption("Gen-Z Slayer")
 menu = MainMenu(WIDTH, HEIGHT)
 game_running = False
 run = True
-num_zombies = 50
+num_zombies = 1
 game_over = False
 victory = False
 
@@ -31,6 +32,9 @@ while run:
         game = Game(WIDTH, HEIGHT)
         game_over = False
         victory = False
+        boss_spawned = False
+        boss = None
+
         for _ in range(num_zombies):
             new_zombie = Zombie(game.map_width, game.map_height, game.objects)
             game.zombies.append(new_zombie)
@@ -50,9 +54,10 @@ while run:
                     elif event.key == pygame.K_LSHIFT and not game_over and not victory:
                         character.start_dash()
             
-            # Periksa kondisi menang (semua zombie sudah dikalahkan)
-            if len(game.zombies) == 0 and not game_over:
-                victory = True
+            # Periksa kondisi menang (semua zombie dan boss sudah dikalahkan)
+            if len(game.zombies) == 0 and not boss_spawned and not game_over:
+                boss = Boss(game.map_width, game.map_height, game.objects )
+                boss_spawned = True
             
             # Periksa jika karakter masih hidup
             if character.hp <= 0:
@@ -92,6 +97,22 @@ while run:
                 game.animation(character)
                 game.load_char(game.screen, character)
                 game.load_zombies(character)
+                if boss_spawned and boss and not boss.is_dead: #pengecekan boss
+                    game.load_boss(boss, character)
+                    for bullet in game.bullets[:]:
+                        if boss.rect.colliderect(bullet.get_rect()):
+                            boss.take_damage(bullet.damage)
+                            game.bullets.remove(bullet)
+                        frame_index = pygame.time.get_ticks() // 100
+                        boss.update(game, character, frame_index)
+                        game.screen.blit(boss.image, (boss.rect.x - game.offset_x, boss.rect.y - game.offset_y))
+
+
+                    # Cek jika boss sudah mati
+                    if boss.hp <= 0:
+                        boss.is_dead = True
+                        victory = True
+
                 game.update_bullets()
                 game.draw_bullets()
             
