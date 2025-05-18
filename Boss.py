@@ -47,6 +47,9 @@ class Boss(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(frame, (self.scale, self.scale))
 
     def move_towards_player(self, game, player_rect, frame_index):
+        # Ensure player_rect is a pygame.Rect
+        if not isinstance(player_rect, pygame.Rect):
+            raise ValueError("player_rect must be a pygame.Rect object")
         dx = player_rect.centerx - self.rect.centerx
         dy = player_rect.centery - self.rect.centery
         distance = max(1, (dx**2 + dy**2)**0.5)
@@ -65,10 +68,13 @@ class Boss(pygame.sprite.Sprite):
         self.rect.bottom = min(game.map_height, self.rect.bottom)
 
         # Cek tabrakan objek
-        for obj_rect in game.objects:
-            if self.rect.colliderect(obj_rect):
-                self.rect = tmp
-                break
+        if hasattr(game, 'objects'):
+            for obj_rect in game.objects:
+                if self.rect.colliderect(obj_rect):
+                    self.rect = tmp
+                    break
+        else:
+            raise AttributeError("game must have an 'objects' attribute")
                 
 
 
@@ -85,20 +91,28 @@ class Boss(pygame.sprite.Sprite):
                 player.hp -= 10
                 self.last_attack_time = current_time
 
-    def take_damage(self, amount):
+    def take_damage(self, amount, game=None, player=None, current_time=None):
         self.hp -= amount
         if self.hp <= 0:
             self.is_dead = True
 
-    def update(self, game, player, frame_index):
-        self.move_towards_player(game, player.rect, frame_index)
-        current_time = pygame.time.get_ticks()
-        self.attack_player(player, current_time)
+        if game is not None and hasattr(game, 'bullets'):
+            for bullet in game.bullets[:]:
+                if hasattr(bullet, 'get_rect') and hasattr(bullet, 'damage'):
+                    if self.rect.colliderect(bullet.get_rect()):
+                        self.take_damage(bullet.damage, game, player, current_time)
+                        game.bullets.remove(bullet)
+        elif game is not None:
+            raise AttributeError("game must have a 'bullets' attribute")
 
-        for bullet in game.bullets[:]:
-            if self.rect.colliderect(bullet.get_rect()):
-                self.take_damage(bullet.damage)
-                game.bullets.remove(bullet)
+        if player is not None and current_time is not None:
+            self.attack_player(player, current_time)
+
+        if game is not None and hasattr(game, 'bullets'):
+            for bullet in game.bullets[:]:
+                if self.rect.colliderect(bullet.get_rect()):
+                    self.take_damage(bullet.damage, game, player, current_time)
+                    game.bullets.remove(bullet)
 
         if self.is_dead:
             # Bisa tambahkan animasi mati
