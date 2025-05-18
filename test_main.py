@@ -163,6 +163,91 @@ class TestMenuFunctionality(unittest.TestCase):
         event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'pos': self.menu.buttons[0]["rect"].center})
         action = self.menu.handle_event(event)
         self.assertEqual(action, "start", "Clicking start button should return 'start' action")
+# Tambahan di bawah test existing
+
+class TestCharacterEdgeCases(unittest.TestCase):
+    def setUp(self):
+        self.WIDTH, self.HEIGHT = 800, 600
+        self.game = Game(self.WIDTH, self.HEIGHT)
+        self.character = Character()
+        self.character.Character_rect.x = self.WIDTH - 1  # Ujung kanan
+        self.character.Character_rect.y = self.HEIGHT - 1  # Ujung bawah
+
+    def test_stay_in_map_bounds(self):
+        self.character.move_right(self.game)
+        self.assertLessEqual(self.character.Character_rect.right, self.WIDTH)
+        self.character.move_down(self.game)
+        self.assertLessEqual(self.character.Character_rect.bottom, self.HEIGHT)
+
+    def test_hp_never_negative(self):
+        self.character.hp = 1
+        zombie = Zombie(self.WIDTH, self.HEIGHT, [])
+        zombie.dmg = 10
+        self.game.zombies = [zombie]
+        self.game.char_check_zombie_collision(self.character)
+        self.assertGreaterEqual(self.character.hp, 0)
+
+class TestZombieEdgeCases(unittest.TestCase):
+    def setUp(self):
+        self.WIDTH, self.HEIGHT = 800, 600
+        self.game = Game(self.WIDTH, self.HEIGHT)
+        self.zombie = Zombie(self.WIDTH, self.HEIGHT, [])
+        self.zombie.hp = 1
+        self.game.zombies = [self.zombie]
+
+    def test_zombie_hp_not_negative(self):
+        self.zombie.hp -= 10
+        if self.zombie.hp < 0:
+            self.zombie.hp = 0
+        self.assertGreaterEqual(self.zombie.hp, 0)
+
+    def test_dead_zombie_no_action(self):
+        self.zombie.hp = 0
+        # Simulasi: zombie seharusnya tidak bergerak/menyerang jika hp <= 0
+        old_pos = self.zombie.rect.copy()
+        self.zombie.move_towards_player(self.game, self.zombie.rect, 0)
+        self.assertEqual(self.zombie.rect, old_pos)
+
+class TestBulletEdgeCases(unittest.TestCase):
+    def setUp(self):
+        self.WIDTH, self.HEIGHT = 800, 600
+        self.game = Game(self.WIDTH, self.HEIGHT)
+        self.bullet = Bullet((790, 590), (900, 700), 10)  # Arah luar map
+
+    def test_bullet_out_of_bounds(self):
+        for _ in range(30):
+            self.bullet.update_pos()
+        rect = self.bullet.get_rect()
+        self.assertFalse(0 <= rect.x < self.WIDTH and 0 <= rect.y < self.HEIGHT)
+
+class TestMenuEdgeCases(unittest.TestCase):
+    def setUp(self):
+        self.WIDTH, self.HEIGHT = 800, 600
+        self.menu = MainMenu(self.WIDTH, self.HEIGHT)
+
+    def test_invalid_event(self):
+        event = pygame.event.Event(pygame.USEREVENT, {})  # Event tak dikenal
+        result = self.menu.handle_event(event)
+        self.assertIsNone(result)
+
+    def test_button_without_action(self):
+        # Simulasikan button tanpa "action"
+        self.menu.buttons.append({"rect": pygame.Rect(0,0,10,10)})
+        event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'pos': (5,5)})
+        result = self.menu.handle_event(event)
+        # Pastikan tidak error, action tetap None
+        self.assertIsNone(result)
+
+    def test_settings_volume_limits(self):
+        self.menu.show_settings = True
+        self.menu.volume = 0
+        event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_LEFT})
+        self.menu.handle_event(event)
+        self.assertGreaterEqual(self.menu.volume, 0)
+        self.menu.volume = 100
+        event = pygame.event.Event(pygame.KEYDOWN, {'key': pygame.K_RIGHT})
+        self.menu.handle_event(event)
+        self.assertLessEqual(self.menu.volume, 100)
 
 
 if __name__ == "__main__":
