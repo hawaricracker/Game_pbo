@@ -70,6 +70,7 @@ while run:
                 game.movement(character, keys)
                 character.update_dash()
                 game.check_dash_collision_with_zombies(character)
+                character.update_health_regen()
                 
                 # Sistem Tembak dengan LMB
                 mouse_pressed = pygame.mouse.get_pressed()[0]
