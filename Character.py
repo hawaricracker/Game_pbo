@@ -53,6 +53,12 @@ class Character(pygame.sprite.Sprite):
         self.max_hp = 100
         self.weapon = Weapon() 
 
+        self.last_damage_time = time.time()    # Waktu terakhir terkena damage
+        self.regen_delay = 3.0                 # Waktu tunda sebelum mulai regen
+        self.regen_rate = 2.5                  # Jumlah HP yang ditambah per interval
+        self.regen_interval = 1.0              # Frekuensi penambahan (per detik)
+        self.last_regen_time = time.time()     # Waktu terakhir penambahan HP   
+
     def start_dash(self):
         current_time = time.time()
         if current_time - self.last_dash_time >= self.dash_cooldown:
@@ -68,6 +74,16 @@ class Character(pygame.sprite.Sprite):
             if current_time - self.dash_time >= self.dash_duration:
                 self.is_dashing = False
                 self.acceleration = self.normal_speed
+
+    def update_health_regen(self):
+        current_time = time.time()
+
+    # Hanya regen jika HP belum penuh dan sudah lewat delay sejak terakhir kena damage
+        if self.hp < self.max_hp and current_time - self.last_damage_time >= self.regen_delay:
+            if current_time - self.last_regen_time >= self.regen_interval:
+                self.hp += self.regen_rate
+                self.hp = min(self.hp, self.max_hp)  # Jangan melebihi max
+                self.last_regen_time = current_time            
     
     
     def idling(self, frame_index):
