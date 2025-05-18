@@ -1,5 +1,6 @@
 import pygame
 import pytmx
+import time
 from Bullet import *  # ⬅ Tambahan: import Bullet untuk sistem peluru
 
 class Game:
@@ -111,8 +112,10 @@ class Game:
     def char_check_zombie_collision(self, character):
         for zombie in self.zombies:
             if character.Character_rect.colliderect(zombie.rect):
-                character.hp -= zombie.dmg
-                character.hp = max(0, character.hp)  # Pastikan HP tidak negatif
+                character.hp -= zombie.dmg                # Pastikan HP tidak negatif
+                character.hp = max(0, character.hp)
+                character.last_damage_time = time.time()  # Reset timer regen saat terkena damage
+                  
 
     def draw_health_bar(self, hp, max_hp, entity, width=30, height=6):
         health_ratio = hp / max_hp
@@ -200,7 +203,7 @@ class Game:
                 if distance == 0:
                     continue
 
-                push_strength = 30  # Jarak dorongan
+                push_strength = 30 # Jarak dorongan
                 dx /= distance
                 dy /= distance
 
