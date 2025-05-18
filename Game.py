@@ -78,6 +78,16 @@ class Game:
             ))
             self.draw_health_bar(zombie.hp, zombie.max_hp, zombie)
 
+    def load_boss(self, boss, player):
+        if boss and not boss.is_dead:
+            boss.idling(self.frame_index)
+            boss.move_towards_player(self, player.Character_rect, self.frame_index)
+            self.screen.blit(boss.image, (
+                boss.rect.x + self.offset_x,
+                boss.rect.y + self.offset_y
+            ))
+            self.draw_health_bar(boss.hp, boss.max_hp, boss)
+
     def movement(self, character, keys):
         character.speed = [0, 0]
         if keys[pygame.K_d]:
