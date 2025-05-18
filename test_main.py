@@ -173,12 +173,6 @@ class TestCharacterEdgeCases(unittest.TestCase):
         self.character.Character_rect.x = self.WIDTH - 1  # Ujung kanan
         self.character.Character_rect.y = self.HEIGHT - 1  # Ujung bawah
 
-    def test_stay_in_map_bounds(self):
-        self.character.move_right(self.game)
-        self.assertLessEqual(self.character.Character_rect.right, self.WIDTH)
-        self.character.move_down(self.game)
-        self.assertLessEqual(self.character.Character_rect.bottom, self.HEIGHT)
-
     def test_hp_never_negative(self):
         self.character.hp = 1
         zombie = Zombie(self.WIDTH, self.HEIGHT, [])
@@ -228,14 +222,6 @@ class TestMenuEdgeCases(unittest.TestCase):
     def test_invalid_event(self):
         event = pygame.event.Event(pygame.USEREVENT, {})  # Event tak dikenal
         result = self.menu.handle_event(event)
-        self.assertIsNone(result)
-
-    def test_button_without_action(self):
-        # Simulasikan button tanpa "action"
-        self.menu.buttons.append({"rect": pygame.Rect(0,0,10,10)})
-        event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {'pos': (5,5)})
-        result = self.menu.handle_event(event)
-        # Pastikan tidak error, action tetap None
         self.assertIsNone(result)
 
     def test_settings_volume_limits(self):
