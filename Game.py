@@ -2,6 +2,7 @@ import pygame
 import pytmx
 import time
 from Bullet import *  # ⬅ Tambahan: import Bullet untuk sistem peluru
+from Zombies import Zombie
 
 class Game:
     def __init__(self, width, height):
