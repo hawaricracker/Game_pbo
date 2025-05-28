@@ -77,6 +77,22 @@ class TestCharacterFunctionality(unittest.TestCase):
         self.character.idling(0)
         surface_scaled = pygame.transform.scale(self.character.idling_frame_list[0], (self.character.scale, self.character.scale))
         self.assertEqual(self.character.player.get_size(), surface_scaled.get_size())
+    
+    def test_character_takes_damage_from_boss_collision(self):
+        from Boss import Boss
+        boss = Boss(self.game.map_width, self.game.map_height, self.game.objects)
+        self.character.Character_rect.center = (100, 100)
+        boss.rect.center = (110, 110)  # Jarak kurang dari attack_range (80 piksel)
+        initial_hp = self.character.get_hp()
+        current_time = pygame.time.get_ticks()
+        boss.last_attack_time = current_time - boss.attack_cooldown  # Ensure cooldown is satisfied
+        boss.attack_player(self.character, current_time)
+        # Debug: Verify distance calculation
+        distance = ((self.character.get_rect().centerx - boss.get_rect().centerx) ** 2 +
+                    (self.character.get_rect().centery - boss.get_rect().centery) ** 2) ** 0.5
+        self.assertLessEqual(distance, boss.attack_range, "Character and boss should be within attack range")
+        self.assertLess(self.character.get_hp(), initial_hp, "Character should take damage from boss collision")
+        self.assertEqual(self.character.get_hp(), initial_hp - 10, "Character should lose exactly 10 HP from boss attack")
 
 
 class TestZombieFunctionality(unittest.TestCase):

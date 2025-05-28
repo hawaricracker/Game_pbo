@@ -15,19 +15,18 @@ class Game:
         self.map_width = 0
         self.map_height = 0
         self.zombies = []
-        self.bullets = []  # ⬅ Tambahan: menyimpan semua peluru aktif dalam game
-
+        self.bullets = []
         # Load map dimensions immediately
         tmx_data = pytmx.load_pygame("Asset/MAP/map1.tmx")
         self.map_width = tmx_data.width * tmx_data.tilewidth
         self.map_height = tmx_data.height * tmx_data.tileheight
-
         for layer in tmx_data.visible_layers:
             if isinstance(layer, pytmx.TiledObjectGroup):
                 for obj in layer:
                     if obj.type == "Obstacle":
                         obj_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
                         self.objects.append(obj_rect)
+        self.zombies = [z for z in self.zombies if isinstance(z, Zombie)]  # Ensure no Boss in zombies
 
     def load_map(self, screen, filename, character):
         screen.fill((0, 0, 0))
@@ -59,6 +58,16 @@ class Game:
                         self.objects.append(obj_rect)
 
         self.frame_index += 1
+    
+    def load_entities(self, entities, player):
+        for entity in entities:
+            entity.idling(self.frame_index)
+            entity.move_towards(self, player.Character_rect, self.frame_index)
+            self.screen.blit(entity.image, (
+                entity.rect.x + self.offset_x,
+                entity.rect.y + self.offset_y
+            ))
+            self.draw_health_bar(entity.get_hp(), entity.max_hp, entity)
 
     def load_char(self, screen, char):
         self.char_check_zombie_collision(char)
@@ -69,24 +78,11 @@ class Game:
         self.draw_health_bar(char.hp, char.max_hp, char)
 
     def load_zombies(self, character):
-        for zombie in self.zombies:
-            zombie.idling(self.frame_index)
-            zombie.move_towards_player(self, character.Character_rect, self.frame_index)
-            self.screen.blit(zombie.image, (
-                zombie.rect.x + self.offset_x,
-                zombie.rect.y + self.offset_y
-            ))
-            self.draw_health_bar(zombie.hp, zombie.max_hp, zombie)
+        self.load_entities(self.zombies, character)
 
     def load_boss(self, boss, player):
         if boss and not boss.is_dead:
-            boss.idling(self.frame_index)
-            boss.move_towards_player(self, player.Character_rect, self.frame_index)
-            self.screen.blit(boss.image, (
-                boss.rect.x + self.offset_x,
-                boss.rect.y + self.offset_y
-            ))
-            self.draw_health_bar(boss.hp, boss.max_hp, boss)
+            self.load_entities([boss], player)
 
     def movement(self, character, keys):
         character.speed = [0, 0]
@@ -119,12 +115,12 @@ class Game:
         character.acceleration = 5
         return 0
 
+    #Implementasi Enkapsulasi
     def char_check_zombie_collision(self, character):
         for zombie in self.zombies:
-            if character.Character_rect.colliderect(zombie.rect):
-                character.hp -= zombie.dmg                # Pastikan HP tidak negatif
-                character.hp = max(0, character.hp)
-                character.last_damage_time = time.time()  # Reset timer regen saat terkena damage
+            if character.get_rect().colliderect(zombie.rect):
+                character.set_hp(character.get_hp() - zombie.dmg)  # Gunakan getter dan setter
+                character.last_damage_time = time.time() # Reset timer regen saat terkena damage
                   
 
     def draw_health_bar(self, hp, max_hp, entity, width=30, height=6):
@@ -265,3 +261,7 @@ class Game:
         self.screen.blit(victory_text, victory_rect)
         self.screen.blit(exit_text, exit_rect)
         pygame.display.flip()
+    
+    def char_check_boss_collision(self, character, boss, current_time):
+        if boss and not boss.is_dead:
+            boss.attack_player(character, current_time)

@@ -1,7 +1,8 @@
 import pygame
 import random
+from Entity import Entity
 
-class Boss(pygame.sprite.Sprite):
+class Boss(Entity):
     def __init__(self, map_width, map_height, objects):
         super().__init__()
         self.boss_frame_list = []
@@ -84,11 +85,13 @@ class Boss(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(frame, (self.scale, self.scale))
 
     def attack_player(self, player, current_time):
-        distance = ((player.rect.centerx - self.rect.centerx) ** 2 +
-                    (player.rect.centery - self.rect.centery) ** 2) ** 0.5
+        # Use getter method for player's rect to support encapsulation
+        player_rect = player.get_rect()
+        distance = ((player_rect.centerx - self.rect.centerx) ** 2 +
+                    (player_rect.centery - self.rect.centery) ** 2) ** 0.5
         if distance <= self.attack_range:
             if current_time - self.last_attack_time >= self.attack_cooldown:
-                player.hp -= 10
+                player.set_hp(player.get_hp() - 10)  # Use setter for HP
                 self.last_attack_time = current_time
 
     def take_damage(self, amount, game=None, player=None, current_time=None):
@@ -96,24 +99,18 @@ class Boss(pygame.sprite.Sprite):
         if self.hp <= 0:
             self.is_dead = True
 
-        if game is not None and hasattr(game, 'bullets'):
-            for bullet in game.bullets[:]:
-                if hasattr(bullet, 'get_rect') and hasattr(bullet, 'damage'):
-                    if self.rect.colliderect(bullet.get_rect()):
-                        self.take_damage(bullet.damage, game, player, current_time)
-                        game.bullets.remove(bullet)
-        elif game is not None:
-            raise AttributeError("game must have a 'bullets' attribute")
+    #Enkapsulasi
+    def get_hp(self):
+        return self.hp
 
-        if player is not None and current_time is not None:
-            self.attack_player(player, current_time)
+    def set_hp(self, value):
+        self.hp = max(0, min(value, self.max_hp))
 
-        if game is not None and hasattr(game, 'bullets'):
-            for bullet in game.bullets[:]:
-                if self.rect.colliderect(bullet.get_rect()):
-                    self.take_damage(bullet.damage, game, player, current_time)
-                    game.bullets.remove(bullet)
+    def get_rect(self):
+        return self.rect
 
-        if self.is_dead:
-            # Bisa tambahkan animasi mati
-            pass
+    def set_rect(self, rect):
+        self.rect = rect
+
+    def move_towards(self, game, player_rect, frame_index):
+        self.move_towards_player(game, player_rect, frame_index)

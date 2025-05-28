@@ -1,5 +1,5 @@
 import pygame
-from win32api import GetSystemMetrics #Install pip win32api agar game berjalan pada fullscreen
+from win32api import GetSystemMetrics
 from Game import *
 from Character import *
 from Zombies import *
@@ -47,7 +47,7 @@ while run:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         if game_over or victory:
-                            game_running = False  # Kembali ke menu utama
+                            game_running = False
                         else:
                             game_running = False
                             run = False
@@ -56,21 +56,20 @@ while run:
             
             # Periksa kondisi menang (semua zombie dan boss sudah dikalahkan)
             if len(game.zombies) == 0 and not boss_spawned and not game_over:
-                boss = Boss(game.map_width, game.map_height, game.objects )
+                boss = Boss(game.map_width, game.map_height, game.objects)
                 boss_spawned = True
+                print("Boss spawned")  # Debug: Confirm single boss spawn
             
             # Periksa jika karakter masih hidup
-            if character.hp <= 0:
+            if character.get_hp() <= 0:
                 game_over = True
             
             if game_over:
-                # Tampilkan layar game over dan tunggu input
                 game.show_game_over()
             elif victory:
-                # Tampilkan layar kemenangan dan tunggu input
                 game.show_victory()
             else:
-                # Gerakan keyboard
+                # Gerakan keyboard (hanya untuk karakter)
                 keys = pygame.key.get_pressed()
                 game.movement(character, keys)
                 character.update_dash()
@@ -81,7 +80,7 @@ while run:
                 mouse_pressed = pygame.mouse.get_pressed()[0]
                 mouse_pos = pygame.mouse.get_pos()
                 
-                player_world_pos = character.Character_rect.center
+                player_world_pos = character.get_rect().center
                 target_world_pos = (
                     mouse_pos[0] - game.offset_x,
                     mouse_pos[1] - game.offset_y
@@ -97,22 +96,14 @@ while run:
                 game.animation(character)
                 game.load_char(game.screen, character)
                 game.load_zombies(character)
-                if boss_spawned and boss and not boss.is_dead: #pengecekan boss
+                if boss_spawned and boss and not boss.is_dead:
                     game.load_boss(boss, character)
                     for bullet in game.bullets[:]:
-                        if boss.rect.colliderect(bullet.get_rect()):
+                        if boss.get_rect().colliderect(bullet.get_rect()):
                             boss.take_damage(bullet.damage)
                             game.bullets.remove(bullet)
-                        frame_index = pygame.time.get_ticks() // 100
-                        boss.update(game, character, frame_index)
-                        game.screen.blit(boss.image, (boss.rect.x - game.offset_x, boss.rect.y - game.offset_y))
-
-
-                    # Cek jika boss sudah mati
-                    if boss.hp <= 0:
-                        boss.is_dead = True
-                        victory = True
-
+                    game.char_check_boss_collision(character, boss, pygame.time.get_ticks())
+                
                 game.update_bullets()
                 game.draw_bullets()
             

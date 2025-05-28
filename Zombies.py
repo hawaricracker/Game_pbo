@@ -1,7 +1,8 @@
 import pygame
 import random
+from Entity import Entity
 
-class Zombie(pygame.sprite.Sprite):
+class Zombie(Entity):
     def __init__(self, map_width, map_height, objects):
         pygame.sprite.Sprite.__init__(self)
         self.zombie_frame_list = []
@@ -72,3 +73,23 @@ class Zombie(pygame.sprite.Sprite):
         if move_x != 0 and move_y != 0:
             self.image = self.zombie_frame_list[((frame_index // 7) % 6) + 4]
             self.image = pygame.transform.scale(self.image, (self.scale, self.scale))
+    
+    def move_towards(self, game, player_rect, frame_index):
+        self.move_towards_player(game, player_rect, frame_index)
+    
+    def take_damage(self, amount):
+        self.hp -= amount
+        if self.hp <= 0:
+            self.kill()
+    
+    def get_hp(self):
+        return self.hp
+
+    def set_hp(self, value):
+        self.hp = max(0, min(value, self.max_hp))
+
+    def get_rect(self):
+        return self.rect
+
+    def set_rect(self, rect):
+        self.rect = rect

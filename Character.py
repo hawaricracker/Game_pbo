@@ -1,10 +1,11 @@
 import pygame
 import time
 from Weapon import Weapon
+from Entity import Entity
 #class player
-class Character(pygame.sprite.Sprite):
+class Character(Entity):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
+        super().__init__()
         self.idling_frame_list = []
         self.moustache_frame_list = []
         self.shirt_frame_list = []
@@ -13,9 +14,6 @@ class Character(pygame.sprite.Sprite):
         self.player_moustache = pygame.image.load("zombie/ZombieShooter/Sprites/Character/Moustach/Moustach1.png")
         self.player_shirt = pygame.image.load("zombie/ZombieShooter/Sprites/Character/Shirt/Shirt1.png")
         self.weapon_img = pygame.image.load("zombie/ZombieShooter/Sprites/Objects&Tiles/Weapons.png")
-
-        
-
 
         for y in range(self.player.get_height() // 32):
             for x in range(self.player.get_width() // 32):
@@ -138,3 +136,35 @@ class Character(pygame.sprite.Sprite):
         self.Character_rect.right = min(game.map_width, self.Character_rect.right)
         self.Character_rect.top = max(0, self.Character_rect.top)
         self.Character_rect.bottom = min(game.map_height, self.Character_rect.bottom)
+
+    #Enkapsulasi
+    def get_hp(self):
+        return self.hp
+
+    def set_hp(self, value):
+        self.hp = max(0, min(value, self.max_hp))  # Pastikan HP tetap dalam batas
+
+    def get_rect(self):
+        return self.Character_rect
+
+    def set_rect(self, rect):
+        self.Character_rect = rect
+
+    def move_towards(self, game, target_rect, frame_index):
+        # Implementasi gerakan karakter
+        keys = pygame.key.get_pressed()
+        self.speed = [0, 0]
+        if keys[pygame.K_d]:
+            self.move_right(game)
+        elif keys[pygame.K_a]:
+            self.move_left(game)
+        elif keys[pygame.K_w]:
+            self.move_up(game)
+        elif keys[pygame.K_s]:
+            self.move_down(game)
+        self.animation(frame_index)
+
+    def take_damage(self, amount):
+        self.hp -= amount
+        self.hp = max(0, self.hp)
+        self.last_damage_time = time.time()
