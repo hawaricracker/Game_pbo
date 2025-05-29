@@ -8,7 +8,11 @@ class Boss(Entity):
         self.boss_frame_list = []
 
         # Load sprite sheet boss
-        sprite_sheet = pygame.image.load("zombie/ZombieShooter/Sprites/Zombie/Zombie_Boss.png").convert_alpha()
+        try:
+            sprite_sheet = pygame.image.load("zombie/ZombieShooter/Sprites/Zombie/Zombie_Boss.png").convert_alpha()
+        except FileNotFoundError:
+            print("Gambar Boss tidak ditemukan, pakai gambar default!")
+            sprite_sheet = pygame.Surface((64, 64))  # Ganti dengan surface kosong kalau gagal
         frame_width, frame_height = 64, 64
 
         # Potong frame

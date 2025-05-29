@@ -37,7 +37,11 @@ class Game:
         self.offset_y = self.HEIGHT // 2 - character.Character_rect.centery
 
         # Load the Tiled map
-        tmx_data = pytmx.load_pygame(filename)
+        try:
+            tmx_data = pytmx.load_pygame(filename)
+        except Exception as e:
+            print(f"Error memuat peta: {e}, pakai peta kosong!")
+            tmx_data = None  # Lanjut dengan peta kosong kalau gagal
         self.map_width = tmx_data.width * tmx_data.tilewidth
         self.map_height = tmx_data.height * tmx_data.tileheight
 

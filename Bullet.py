@@ -23,10 +23,13 @@ class Bullet:
         # Hitung sudut arah peluru (dalam derajat)
         self.angle = math.degrees(math.atan2(-dy, dx))  # Negatif dy untuk orientasi Pygame
 
-        for y in range(self.bullet.get_height() // 16):
-            for x in range(self.bullet.get_width() // 16):
-                frame = self.bullet.subsurface((x * 16, y * 16, 16, 16))
-                self.bullet_frame_list.append(frame)
+        try:
+            for y in range(self.bullet.get_height() // 16):
+                for x in range(self.bullet.get_width() // 16):
+                    frame = self.bullet.subsurface((x * 16, y * 16, 16, 16))
+                    self.bullet_frame_list.append(frame)
+        except ValueError:
+            print("Ukuran sprite Bullet tidak sesuai, lewati animasi!")
 
     def update_pos(self):
         if not self.collided:  # Hanya update posisi jika belum menabrak

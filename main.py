@@ -28,8 +28,12 @@ while run:
             run = False
 
     if game_running:
-        character = Character()
-        game = Game(WIDTH, HEIGHT)
+        try:
+            character = Character()
+            game = Game(WIDTH, HEIGHT)
+        except MemoryError:
+            print("Kesalahan memori, coba ulang!")
+            run = False
         game_over = False
         victory = False
         boss_spawned = False

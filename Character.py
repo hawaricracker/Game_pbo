@@ -150,19 +150,8 @@ class Character(Entity):
     def set_rect(self, rect):
         self.Character_rect = rect
 
-    def move_towards(self, game, target_rect, frame_index):
-        # Implementasi gerakan karakter
-        keys = pygame.key.get_pressed()
-        self.speed = [0, 0]
-        if keys[pygame.K_d]:
-            self.move_right(game)
-        elif keys[pygame.K_a]:
-            self.move_left(game)
-        elif keys[pygame.K_w]:
-            self.move_up(game)
-        elif keys[pygame.K_s]:
-            self.move_down(game)
-        self.animation(frame_index)
+    def move_towards(self):
+        pass
 
     def take_damage(self, amount):
         self.hp -= amount
