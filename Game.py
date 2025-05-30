@@ -19,7 +19,7 @@ class Game:
         self.bullets = []
         self.boss = None
         # Load map dimensions immediately
-        tmx_data = pytmx.load_pygame("Asset/MAP/map1.tmx")
+        tmx_data = pytmx.load_pygame("Asset/MAP/Map_1.tmx")
         self.map_width = tmx_data.width * tmx_data.tilewidth
         self.map_height = tmx_data.height * tmx_data.tileheight
         for layer in tmx_data.visible_layers:
