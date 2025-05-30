@@ -69,6 +69,9 @@ class Zombie(Entity):
             if self.rect.colliderect(obj_rect):
                 self.rect = tmp
                 break
+        
+        # Check collision with other zombies
+        self.check_zombie_collision(game, game.zombies)
 
         if move_x != 0 and move_y != 0:
             self.image = self.zombie_frame_list[((frame_index // 7) % 6) + 4]
@@ -93,3 +96,29 @@ class Zombie(Entity):
 
     def set_rect(self, rect):
         self.rect = rect
+
+    def check_zombie_collision(self, game, zombies):
+        for other_zombie in zombies:
+            if other_zombie != self and self.rect.colliderect(other_zombie.rect):
+                # Store current position before pushing
+                tmp = self.rect.copy()
+                # Calculate push direction
+                dx = self.rect.centerx - other_zombie.rect.centerx
+                dy = self.rect.centery - other_zombie.rect.centery
+                distance = max(1, (dx**2 + dy**2)**0.5)
+                # Normalize and apply reduced push strength
+                push_x = (dx / distance) * 1
+                push_y = (dy / distance) * 1
+                # Move this zombie away from the other
+                self.rect.x += push_x
+                self.rect.y += push_y
+                # Ensure zombie stays within map bounds
+                self.rect.left = max(0, self.rect.left)
+                self.rect.right = min(game.map_width, self.rect.right)
+                self.rect.top = max(0, self.rect.top)
+                self.rect.bottom = min(game.map_height, self.rect.bottom)
+                # Check collision with map objects after pushing
+                for obj_rect in game.objects:
+                    if self.rect.colliderect(obj_rect):
+                        self.rect = tmp  # Revert to original position if collision occurs
+                        break
