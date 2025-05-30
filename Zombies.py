@@ -1,6 +1,7 @@
 import pygame
 import random
 from Entity import Entity
+from pygame import mixer
 
 class Zombie(Entity):
     def __init__(self, map_width, map_height, objects):
@@ -29,6 +30,12 @@ class Zombie(Entity):
                     valid_position = False
                     break
         
+        try:
+            self.death_sound = mixer.Sound("Asset/SFX/Zombie Sound.wav")
+        except FileNotFoundError:
+            print("Zombie death sound file not found!")
+            self.death_sound = None
+
         self.speed = [0, 0]
         self.acceleration = 0.75
         self.scale = 50
@@ -121,6 +128,8 @@ class Zombie(Entity):
     def take_damage(self, amount):
         self.hp -= amount
         if self.hp <= 0:
+            if self.death_sound:
+                self.death_sound.play()
             self.kill()
     
     def get_hp(self):
