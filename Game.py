@@ -237,41 +237,65 @@ class Game:
 
 
     def show_game_over(self):
-        # Menampilkan layar game over
-        self.screen.fill((0, 0, 0))  # Background hitam
+        try:
+            game_over_bg = pygame.image.load("Asset/PNG/Graveyard_dead.png") 
+            # Scale background ke ukuran layar
+            game_over_bg = pygame.transform.scale(game_over_bg, (self.WIDTH, self.HEIGHT))
+            self.screen.blit(game_over_bg, (0, 0))
+        except:
+            # Fallback ke background hitam jika gambar tidak ditemukan
+            self.screen.fill((0, 0, 0))
         
-        # Teks game over
-        font = pygame.font.Font(None, 74)
-        game_over_text = font.render("GAME OVER", True, (255, 0, 0))
-        game_over_rect = game_over_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 - 50))
-        
-        # Instruksi keluar
+        # Overlay gelap untuk membuat teks lebih mudah dibaca
+        overlay = pygame.Surface((self.WIDTH, self.HEIGHT))
+        overlay.set_alpha(100)  # Transparansi (0-255)
+        overlay.fill((0, 0, 0))
+        self.screen.blit(overlay, (0, 0))
+                
+        # Instruksi keluar dengan shadow
         small_font = pygame.font.Font(None, 36)
-        exit_text = small_font.render("Press ESC to return to main menu", True, (255, 255, 255))
-        exit_rect = exit_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 + 50))
         
-        # Tampilkan teks
-        self.screen.blit(game_over_text, game_over_rect)
+        # Shadow untuk instruksi
+        exit_shadow = small_font.render("Press ESC to return to main menu", True, (0, 0, 0))
+        exit_shadow_rect = exit_shadow.get_rect(center=(self.WIDTH // 2 + 2, self.HEIGHT // 2 + 452))
+        self.screen.blit(exit_shadow, exit_shadow_rect)
+        
+        # Teks instruksi utama
+        exit_text = small_font.render("Press ESC to return to main menu", True, (255, 255, 255))
+        exit_rect = exit_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 + 450))
         self.screen.blit(exit_text, exit_rect)
+        
         pygame.display.flip()
 
     def show_victory(self):
-        # Menampilkan layar kemenangan
-        self.screen.fill((0, 0, 0))  # Background hitam
+        try:
+            victory_bg = pygame.image.load("Asset/PNG/Survived_bg.png") 
+            # Scale background ke ukuran layar
+            victory_bg = pygame.transform.scale(victory_bg, (self.WIDTH, self.HEIGHT))
+            self.screen.blit(victory_bg, (0, 0))
+        except:
+            # Fallback ke background hitam jika gambar tidak ditemukan
+            self.screen.fill((0, 0, 0))
         
-        # Teks kemenangan
-        font = pygame.font.Font(None, 74)
-        victory_text = font.render("YOU WIN!", True, (0, 255, 0))
-        victory_rect = victory_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 - 50))
+        # Overlay gelap untuk membuat teks lebih mudah dibaca
+        overlay = pygame.Surface((self.WIDTH, self.HEIGHT))
+        overlay.set_alpha(80)  # Transparansi lebih rendah untuk victory (lebih cerah)
+        overlay.fill((0, 0, 0))
+        self.screen.blit(overlay, (0, 0))
         
-        # Instruksi keluar
+        # Instruksi keluar dengan shadow
         small_font = pygame.font.Font(None, 36)
-        exit_text = small_font.render("Press ESC to return to main menu", True, (255, 255, 255))
-        exit_rect = exit_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 + 50))
         
-        # Tampilkan teks
-        self.screen.blit(victory_text, victory_rect)
+        # Shadow untuk instruksi
+        exit_shadow = small_font.render("Press ESC to return to main menu", True, (0, 0, 0))
+        exit_shadow_rect = exit_shadow.get_rect(center=(self.WIDTH // 2 + 2, self.HEIGHT // 2 + 452))
+        self.screen.blit(exit_shadow, exit_shadow_rect)
+        
+        # Teks instruksi utama
+        exit_text = small_font.render("Press ESC to return to main menu", True, (255, 255, 255))
+        exit_rect = exit_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 + 450))
         self.screen.blit(exit_text, exit_rect)
+        
         pygame.display.flip()
     
     def char_check_boss_collision(self, character, boss, current_time):
