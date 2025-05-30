@@ -94,7 +94,6 @@ class TestCharacterFunctionality(unittest.TestCase):
         self.assertLess(self.character.get_hp(), initial_hp, "Character should take damage from boss collision")
         self.assertEqual(self.character.get_hp(), initial_hp - boss.damage, "Character should lose exactly 10 HP from boss attack")
 
-
 class TestZombieFunctionality(unittest.TestCase):
     def setUp(self):
         self.WIDTH, self.HEIGHT = 800, 600
@@ -129,7 +128,6 @@ class TestZombieFunctionality(unittest.TestCase):
         initial_hp = self.character.hp
         self.game.char_check_zombie_collision(self.character)
         self.assertLess(self.character.hp, initial_hp, "Player should take damage from zombie collision")
-
 
 class TestWeaponAndBulletFunctionality(unittest.TestCase):
     def setUp(self):
@@ -167,7 +165,6 @@ class TestWeaponAndBulletFunctionality(unittest.TestCase):
                 zombie.hp -= bullet.damage
                 break
         self.assertLess(zombie.hp, initial_hp, "Zombie should take damage from bullet collision")
-
 
 class TestMenuFunctionality(unittest.TestCase):
     def setUp(self):
