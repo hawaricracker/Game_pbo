@@ -42,7 +42,6 @@ class Boss(Entity):
         self.max_hp = 5000
         self.damage = 25 / 60
         self.is_dead = False
-
         self.attack_range = 80
         self.attack_cooldown = 1000
         self.last_attack_time = 0
@@ -95,7 +94,7 @@ class Boss(Entity):
                     (player_rect.centery - self.rect.centery) ** 2) ** 0.5
         if distance <= self.attack_range:
             if current_time - self.last_attack_time >= self.attack_cooldown:
-                player.set_hp(player.get_hp() - 10)  # Use setter for HP
+                player.set_hp(player.get_hp() - self.damage)  # Use setter for HP
                 self.last_attack_time = current_time
 
     def take_damage(self, amount, game=None, player=None, current_time=None):
