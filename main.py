@@ -13,7 +13,7 @@ pygame.display.set_caption("Gen-Z Slayer")
 menu = MainMenu(WIDTH, HEIGHT)
 game_running = False
 run = True
-num_zombies = 1
+num_zombies = 25
 game_over = False
 victory = False
 
