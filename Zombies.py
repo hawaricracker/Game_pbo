@@ -46,17 +46,60 @@ class Zombie(Entity):
         # Calculate direction vector to player
         dx = player_rect.centerx - self.rect.centerx
         dy = player_rect.centery - self.rect.centery
-        # Calculate distance to avoid division by zero
         distance = max(1, (dx**2 + dy**2)**0.5)
-        # Normalize direction and apply speed
         move_x = (dx / distance) * self.speed
         move_y = (dy / distance) * self.speed
         
-        # Store previous position for collision handling
+        # Store previous position
         tmp = self.rect.copy()
-        # Update position
+        
+        # Try moving in both directions
         self.rect.x += move_x
         self.rect.y += move_y
+        collided = False
+        blocking_obj = None
+        for obj_rect in game.objects:
+            if self.rect.colliderect(obj_rect):
+                collided = True
+                blocking_obj = obj_rect
+                break
+        
+        if collided:
+            self.rect = tmp  # Revert to original position
+            # Determine if obstacle is primarily above, below, left, or right
+            obj_center_x, obj_center_y = blocking_obj.center
+            relative_x = obj_center_x - self.rect.centerx
+            relative_y = obj_center_y - self.rect.centery
+            
+            # Prioritize movement based on player position and obstacle location
+            if abs(relative_x) > abs(relative_y):  # Obstacle is more left/right
+                # Prefer y movement (up/down)
+                preferred_y = self.speed if dy > 0 else -self.speed  # Move toward player
+                self.rect.y += preferred_y
+                for obj_rect in game.objects:
+                    if self.rect.colliderect(obj_rect):
+                        self.rect.y = tmp.y
+                        # Try opposite y direction
+                        self.rect.y += -preferred_y
+                        for obj_rect in game.objects:
+                            if self.rect.colliderect(obj_rect):
+                                self.rect.y = tmp.y
+                                break
+                self.rect.x = tmp.x  # Keep x unchanged
+            else:  # Obstacle is more above/below
+                # Prefer x movement (left/right)
+                preferred_x = self.speed if dx > 0 else -self.speed  # Move toward player
+                self.rect.x += preferred_x
+                for obj_rect in game.objects:
+                    if self.rect.colliderect(obj_rect):
+                        self.rect.x = tmp.x
+                        # Try opposite x direction
+                        self.rect.x += -preferred_x
+                        for obj_rect in game.objects:
+                            if self.rect.colliderect(obj_rect):
+                                self.rect.x = tmp.x
+                                break
+                self.rect.y = tmp.y  # Keep y unchanged
         
         # Restrict to map bounds
         self.rect.left = max(0, self.rect.left)
@@ -64,16 +107,11 @@ class Zombie(Entity):
         self.rect.top = max(0, self.rect.top)
         self.rect.bottom = min(game.map_height, self.rect.bottom)
         
-        # Check collision with houses
-        for obj_rect in game.objects:
-            if self.rect.colliderect(obj_rect):
-                self.rect = tmp
-                break
-        
         # Check collision with other zombies
         self.check_zombie_collision(game, game.zombies)
-
-        if move_x != 0 and move_y != 0:
+        
+        # Update animation
+        if self.rect.x != tmp.x or self.rect.y != tmp.y:
             self.image = self.zombie_frame_list[((frame_index // 7) % 6) + 4]
             self.image = pygame.transform.scale(self.image, (self.scale, self.scale))
     

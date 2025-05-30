@@ -251,6 +251,5 @@ class TestMenuEdgeCases(unittest.TestCase):
         self.menu.handle_event(event)
         self.assertLessEqual(self.menu.volume, 100)
 
-
 if __name__ == "__main__":
     unittest.main()
