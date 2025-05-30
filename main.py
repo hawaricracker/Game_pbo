@@ -67,6 +67,9 @@ while run:
             # Periksa jika karakter masih hidup
             if character.get_hp() <= 0:
                 game_over = True
+
+            if len(game.zombies) == 0 and game.boss.is_dead == True:
+                victory = True
             
             if game_over:
                 game.show_game_over()
