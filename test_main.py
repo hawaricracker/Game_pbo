@@ -92,7 +92,7 @@ class TestCharacterFunctionality(unittest.TestCase):
                     (self.character.get_rect().centery - boss.get_rect().centery) ** 2) ** 0.5
         self.assertLessEqual(distance, boss.attack_range, "Character and boss should be within attack range")
         self.assertLess(self.character.get_hp(), initial_hp, "Character should take damage from boss collision")
-        self.assertEqual(self.character.get_hp(), initial_hp - 10, "Character should lose exactly 10 HP from boss attack")
+        self.assertEqual(self.character.get_hp(), initial_hp - boss.damage, "Character should lose exactly 10 HP from boss attack")
 
 
 class TestZombieFunctionality(unittest.TestCase):

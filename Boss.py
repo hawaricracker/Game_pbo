@@ -40,7 +40,7 @@ class Boss(Entity):
         self.speed = 2
         self.hp = 5000
         self.max_hp = 5000
-        self.damage = 25 / 60
+        self.damage = 2500 / 60
         self.is_dead = False
         self.attack_range = 80
         self.attack_cooldown = 1000

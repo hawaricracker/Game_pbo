@@ -17,6 +17,7 @@ class Game:
         self.map_height = 0
         self.zombies = []
         self.bullets = []
+        self.boss = None
         # Load map dimensions immediately
         tmx_data = pytmx.load_pygame("Asset/MAP/map1.tmx")
         self.map_width = tmx_data.width * tmx_data.tilewidth
@@ -158,7 +159,7 @@ class Game:
 
     def draw_bullets(self):
         bullets_to_remove = []
-        zombies_to_remove = []  # Daftar untuk zombie yang HP-nya <= 0
+        zombies_to_remove = []
         
         for bullet in self.bullets:
             bullet_rect = bullet.get_rect()
@@ -166,25 +167,31 @@ class Game:
             # Jika peluru belum menabrak, periksa kolisi
             if not bullet.collided:
                 obj_list = self.objects.copy() + [z.rect for z in self.zombies]
+                # Tambah bos ke daftar kalau ada dan belum mati
+                if hasattr(self, 'boss') and self.boss and not self.boss.is_dead:
+                    obj_list.append(self.boss.get_rect())
+                
                 for i, obj_rect in enumerate(obj_list):
                     if self.check_collision(bullet_rect, obj_rect):
-                        bullet.collided = True  # Tandai sebagai menabrak
-                        bullet.frame_index = 0  # Reset animasi saat pertama kali menabrak
+                        bullet.collided = True
+                        bullet.frame_index = 0
                         
-                        # Jika menabrak zombie, kurangi HP
-                        if i >= len(self.objects):  # Artinya menabrak zombie
+                        # Jika menabrak zombie
+                        if i >= len(self.objects) and i < len(self.objects) + len(self.zombies):
                             zombie_index = i - len(self.objects)
                             zombie = self.zombies[zombie_index]
-                            zombie.hp -= bullet.damage  # Kurangi HP zombie
+                            zombie.hp -= bullet.damage
                             if zombie.hp <= 0:
-                                zombies_to_remove.append(zombie)  # Tandai untuk dihapus
+                                zombies_to_remove.append(zombie)
+                        # Jika menabrak bos
+                        elif i >= len(self.objects) + len(self.zombies):
+                            self.boss.take_damage(bullet.damage)
                         break
             
             # Gambar peluru berdasarkan status collided
             if bullet.collided:
                 bullet.draw_collision(self.screen, self.offset_x, self.offset_y)
                 bullet.update_frame()
-                # Tandai peluru untuk dihapus setelah animasi selesai
                 if bullet.frame_index >= len(bullet.bullet_frame_list) - 1:
                     bullets_to_remove.append(bullet)
             else:
@@ -195,8 +202,8 @@ class Game:
             self.bullets.remove(bullet)
         
         # Hapus zombie yang HP-nya <= 0
-        for zombie in zombies_to_remove[:]:  # Iterate over a copy to avoid modification during iteration
-            if zombie in self.zombies:  # Ensure the zombie is still in the list
+        for zombie in zombies_to_remove[:]:
+            if zombie in self.zombies:
                 self.zombies.remove(zombie)
 
     

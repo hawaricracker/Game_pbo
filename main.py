@@ -60,9 +60,9 @@ while run:
             
             # Periksa kondisi menang (semua zombie dan boss sudah dikalahkan)
             if len(game.zombies) == 0 and not boss_spawned and not game_over:
-                boss = Boss(game.map_width, game.map_height, game.objects)
+                game.boss = Boss(game.map_width, game.map_height, game.objects)
                 boss_spawned = True
-                print("Boss spawned")  # Debug: Confirm single boss spawn
+                print("Boss spawned")
             
             # Periksa jika karakter masih hidup
             if character.get_hp() <= 0:
@@ -100,13 +100,9 @@ while run:
                 game.animation(character)
                 game.load_char(game.screen, character)
                 game.load_zombies(character)
-                if boss_spawned and boss and not boss.is_dead:
-                    game.load_boss(boss, character)
-                    for bullet in game.bullets[:]:
-                        if boss.get_rect().colliderect(bullet.get_rect()):
-                            boss.take_damage(bullet.damage)
-                            game.bullets.remove(bullet)
-                    game.char_check_boss_collision(character, boss, pygame.time.get_ticks())
+                if boss_spawned and game.boss and not game.boss.is_dead:
+                    game.load_boss(game.boss, character)
+                    game.char_check_boss_collision(character, game.boss, pygame.time.get_ticks())
                 
                 game.update_bullets()
                 game.draw_bullets()
