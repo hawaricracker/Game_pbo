@@ -182,7 +182,7 @@ class MainMenu:
         )
         
         # Instructions text
-        instruction_text = "Atur suara dengan geser atau keypad Atas-Bawah (SOUND) / A-D (MUSIC)"
+        instruction_text = "Atur suara dengan geser atau keypad Kiri-Kanan (SOUND) / A-D (MUSIC)"
         instr_shadow = pygame.font.Font(None, 24).render(instruction_text, True, (0, 0, 0))
         instr_main = pygame.font.Font(None, 24).render(instruction_text, True, (200, 200, 200))
         instr_rect = instr_main.get_rect(center=(self.width//2, 500))
