@@ -25,9 +25,56 @@ class MainMenu:
         self.sound_bar_rect = None
         self.music_bar_rect = None
         
+        # Music system
+        self.menu_music_loaded = False
+        self.menu_music_playing = False
+        
         # Load background image
         self.load_background()
         self.setup_menu()
+        self.load_menu_music()
+
+    def load_menu_music(self):
+        """Load dan mulai memainkan musik menu"""
+        try:
+            # Ganti dengan path musik menu Anda
+            pygame.mixer.init()
+            pygame.mixer.music.load("Asset/SOUND/Home_Screen_Music.mp3")  # atau .ogg, .wav
+            self.menu_music_loaded = True
+            self.play_menu_music()
+        except pygame.error as e:
+            print(f"Tidak dapat memuat musik menu: {e}")
+            try:
+                # Coba format file lain
+                pygame.mixer.music.load("Asset/SOUND/main_menu.mp3")
+                self.menu_music_loaded = True
+                self.play_menu_music()
+            except pygame.error as e2:
+                print(f"Tidak dapat memuat musik menu (format alternatif): {e2}")
+                self.menu_music_loaded = False
+
+    def play_menu_music(self):
+        """Mulai memainkan musik menu"""
+        if self.menu_music_loaded and not self.menu_music_playing:
+            try:
+                pygame.mixer.music.set_volume(self.music / 100.0)
+                pygame.mixer.music.play(-1)  # Loop infinitely
+                self.menu_music_playing = True
+                print("Musik menu dimulai")
+            except pygame.error as e:
+                print(f"Error memainkan musik menu: {e}")
+
+    def stop_menu_music(self):
+        """Hentikan musik menu"""
+        if self.menu_music_playing:
+            pygame.mixer.music.stop()
+            self.menu_music_playing = False
+            print("Musik menu dihentikan")
+
+    def update_music_volume(self):
+        """Update volume musik sesuai pengaturan"""
+        if self.menu_music_playing:
+            pygame.mixer.music.set_volume(self.music / 100.0)
 
     def load_background(self):
         """Load dan resize background image"""
@@ -262,6 +309,7 @@ class MainMenu:
                 self.volume = new_volume
             elif volume_type == "music":
                 self.music = new_volume
+                self.update_music_volume()  # Update volume musik secara real-time
             
             return True
         return False
@@ -303,8 +351,10 @@ class MainMenu:
                     self.volume = min(100, self.volume + 5)
                 elif event.key == pygame.K_a:
                     self.music = max(0, self.music - 5)
+                    self.update_music_volume()
                 elif event.key == pygame.K_d:
                     self.music = min(100, self.music + 5)
+                    self.update_music_volume()
             return None
         else:
             if event.type == pygame.MOUSEBUTTONDOWN:
