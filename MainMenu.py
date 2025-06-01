@@ -39,14 +39,14 @@ class MainMenu:
         try:
             # Ganti dengan path musik menu Anda
             pygame.mixer.init()
-            pygame.mixer.music.load("Asset/SOUND/Home_Screen_Music.mp3")  # atau .ogg, .wav
+            pygame.mixer.music.load("Music + SFX/Home_Screen_Music.mp3")  # atau .ogg, .wav
             self.menu_music_loaded = True
             self.play_menu_music()
         except pygame.error as e:
             print(f"Tidak dapat memuat musik menu: {e}")
             try:
                 # Coba format file lain
-                pygame.mixer.music.load("Asset/SOUND/main_menu.mp3")
+                pygame.mixer.music.load("Asset/SFX/main_menu.mp3")
                 self.menu_music_loaded = True
                 self.play_menu_music()
             except pygame.error as e2:
