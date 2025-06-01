@@ -37,7 +37,3 @@ Repositori ini berisi game top-down shooter yang dikembangkan sebagai proyek aka
 ## Lisensi
 
 Proyek ini dibuat untuk tujuan akademik.
-
----
-
-Silakan salin dan tempel ke file README.md di repo kamu! Jika ingin menambahkan bagian lain atau ada detail khusus, beri tahu saya!
